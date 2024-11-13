@@ -1,0 +1,209 @@
+package azure_vm_policy
+
+required_tags := ["Owner", "Environment", "CostCenter"]
+
+### 1. Network Security and Isolation
+
+# Public IP Address Restriction
+deny[msg] {
+    vm := input.resource_changes[_]
+    vm.type == "azurerm_virtual_machine"
+    vm.change.after.network_interface[_].public_ip_address_id != ""
+    msg := "VMs should not have a public IP assigned unless explicitly required."
+}
+
+# Network Security Group (NSG) Association
+deny[msg] {
+    vm := input.resource_changes[_]
+    vm.type == "azurerm_virtual_machine"
+    not nsg_associated(vm)
+    msg := "VM network interfaces must be associated with a Network Security Group (NSG) for traffic filtering."
+}
+
+nsg_associated(vm) {
+    count([n | n := vm.change.after.network_interface[_].network_security_group_id; n != ""]) > 0
+}
+
+# Allowed Ports in NSG Rules
+deny[msg] {
+    vm := input.resource_changes[_]
+    vm.type == "azurerm_virtual_machine"
+    some i, j
+    vm.change.after.network_interface[i].network_security_group.security_rule[j].source_address_prefix == "0.0.0.0/0"
+    not allowed_port(vm.change.after.network_interface[i].network_security_group.security_rule[j].destination_port_range)
+    msg := "NSG rules must restrict open access (0.0.0.0/0) to allowed ports only."
+}
+
+allowed_port(port) {
+    port == "22" # SSH
+} {
+    port == "3389" # RDP
+}
+
+### 2. Resource Tagging
+
+# Mandatory Tags
+deny[msg] {
+    vm := input.resource_changes[_]
+    vm.type == "azurerm_virtual_machine"
+    not required_tags_exist(vm)
+    msg := "Required tags (Owner, Environment, CostCenter) are missing or incorrect."
+}
+
+required_tags_exist(vm) {
+    all_tags_present := [tag | tag := required_tags[_]; vm.change.after.tags[tag] != ""]
+    count(all_tags_present) == count(required_tags)
+}
+
+### 3. OS and Security Updates
+
+# OS Version Compliance (e.g., ensure VM agent is set)
+deny[msg] {
+    vm := input.resource_changes[_]
+    vm.type == "azurerm_virtual_machine"
+    vm.change.after.os_profile.windows_config.provision_vm_agent != true
+    msg := "VM OS must have the VM agent provisioned to allow management."
+}
+
+# Automatic Updates for Windows VMs
+deny[msg] {
+    vm := input.resource_changes[_]
+    vm.type == "azurerm_virtual_machine"
+    vm.change.after.os_profile.windows_config.enable_automatic_updates == false
+    msg := "Automatic OS updates must be enabled for Windows VMs."
+}
+
+### 4. Disk and Storage Compliance
+
+# Managed Disks Only
+deny[msg] {
+    vm := input.resource_changes[_]
+    vm.type == "azurerm_virtual_machine"
+    vm.change.after.storage_os_disk.managed_disk_id == ""
+    msg := "All VMs must use managed disks for better reliability and performance."
+}
+
+# Premium Storage Requirement for Critical Workloads
+deny[msg] {
+    vm := input.resource_changes[_]
+    vm.type == "azurerm_virtual_machine"
+    vm.change.after.storage_os_disk.storage_account_type != "Premium_LRS"
+    critical_vm(vm)
+    msg := "Critical VMs must use Premium_LRS storage for performance."
+}
+
+critical_vm(vm) {
+    vm.change.after.tags["Environment"] == "Production"
+}
+
+### 5. Encryption and Key Management
+
+# Key Vault Integration for Disk Encryption Keys
+deny[msg] {
+    vm := input.resource_changes[_]
+    vm.type == "azurerm_virtual_machine"
+    not key_vault_integrated(vm)
+    msg := "Disk encryption keys must be stored in Azure Key Vault."
+}
+
+key_vault_integrated(vm) {
+    some encryption
+    vm.change.after.storage_os_disk.encryption_settings[encryption].disk_encryption_key.key_url != ""
+}
+
+# Double Encryption Requirement for Sensitive Data
+deny[msg] {
+    vm := input.resource_changes[_]
+    vm.type == "azurerm_virtual_machine"
+    sensitive_vm(vm)
+    not double_encrypted(vm)
+    msg := "Sensitive VMs require double encryption (platform-managed and customer-managed keys)."
+}
+
+sensitive_vm(vm) {
+    vm.change.after.tags["DataSensitivity"] == "High"
+}
+
+double_encrypted(vm) {
+    some encryption
+    vm.change.after.storage_os_disk.encryption_settings[encryption].disk_encryption_key.key_url != ""
+    vm.change.after.storage_os_disk.encryption_settings[encryption].enabled == true
+}
+
+### 6. Instance Type and Size Constraints
+
+# Instance SKU Restrictions
+allowed_vm_sizes := ["Standard_DS1_v2", "Standard_DS2_v2", "Standard_DS3_v2"]
+
+deny[msg] {
+    vm := input.resource_changes[_]
+    vm.type == "azurerm_virtual_machine"
+    vm_size_not_allowed(vm.change.after.vm_size)
+    msg := "VM instance size is restricted to approved types."
+}
+
+vm_size_not_allowed(vm_size) {
+    count([x | x := allowed_vm_sizes[_]; x == vm_size]) == 0
+}
+
+# Instance Count and Scaling Limits
+deny[msg] {
+    vm := input.resource_changes[_]
+    vm.type == "azurerm_virtual_machine_scale_set"
+    vm.change.after.capacity > 10
+    msg := "VM instance count exceeds allowed maximum for scaling."
+}
+
+### 7. Backup and Disaster Recovery
+
+# Backup Policy Association
+deny[msg] {
+    vm := input.resource_changes[_]
+    vm.type == "azurerm_virtual_machine"
+    critical_vm(vm)
+    vm.change.after.backup_policy_id == null
+    msg := "Critical VMs must have an associated backup policy."
+}
+
+# Availability Zone or Set for High Availability
+deny[msg] {
+    vm := input.resource_changes[_]
+    vm.type == "azurerm_virtual_machine"
+    high_availability_required(vm)
+    not availability_configured(vm)
+    msg := "High-availability VMs must be in an availability set or zone."
+}
+
+high_availability_required(vm) {
+    vm.change.after.tags["HighAvailability"] == "true"
+}
+
+availability_configured(vm) {
+    vm.change.after.availability_set_id != ""
+} {
+    vm.change.after.zone != ""
+}
+
+### 8. Identity and Access Management
+
+# Managed Identity Requirement
+deny[msg] {
+    vm := input.resource_changes[_]
+    vm.type == "azurerm_virtual_machine"
+    vm.change.after.identity == null
+    msg := "Managed identity (system-assigned or user-assigned) must be enabled on VMs."
+}
+
+# Role Assignment Check
+deny[msg] {
+    vm := input.resource_changes[_]
+    vm.type == "azurerm_virtual_machine"
+    excessive_role_assignment(vm)
+    msg := "VM identity is assigned a role with excessive permissions."
+}
+
+excessive_role_assignment(vm) {
+    some role
+    vm.change.after.identity.role_assignments[role].role == "Contributor"
+    sensitive_vm(vm)
+}
