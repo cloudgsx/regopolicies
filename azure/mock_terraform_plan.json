@@ -1,0 +1,21 @@
+{
+    "resource_changes": [
+        {
+            "type": "azurerm_virtual_machine",
+            "change": {
+                "after": {
+                    "vm_size": "Standard_DS1_v2",
+                    "admin_username": "admin",
+                    "storage_os_disk": {
+                        "disk_size_gb": 160,
+                        "encryption_settings": [
+                            {
+                                "enabled": false
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
