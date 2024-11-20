@@ -20,13 +20,16 @@ network_client = NetworkManagementClient(credential, SUBSCRIPTION_ID)
 security_client = SecurityCenter(credential, SUBSCRIPTION_ID)
 
 
-def get_resource_group_name_from_vm_id(vm_id):
-    """Extract the resource group name from the VM ID."""
-    try:
-        return vm_id.split("/")[4]
-    except IndexError:
-        logger.error(f"Unable to extract resource group from VM ID: {vm_id}")
-        return None
+def get_resource_groups():
+    """Get all resource groups in the subscription."""
+    logger.info("Fetching all resource groups...")
+    return resource_client.resource_groups.list()
+
+
+def list_vms_in_resource_group(resource_group_name):
+    """List all VMs in a specific resource group."""
+    logger.info(f"Fetching VMs in resource group: {resource_group_name}")
+    return compute_client.virtual_machines.list(resource_group_name)
 
 
 def check_defender_vm(vm):
@@ -44,7 +47,7 @@ def check_defender_vm(vm):
         return False
 
 
-def check_disk_encryption(vm, resource_group_name):
+def check_disk_encryption(vm):
     """Check if OS and data disks are encrypted with customer-managed keys."""
     compliance = True
     try:
@@ -66,6 +69,24 @@ def check_disk_encryption(vm, resource_group_name):
         compliance = False
 
     return compliance
+
+
+def check_open_ports(vm, resource_group_name):
+    """Check for open management ports."""
+    try:
+        for nic in vm.network_profile.network_interfaces:
+            nic_name = nic.id.split('/')[-1]
+            nic_details = network_client.network_interfaces.get(resource_group_name, nic_name)
+
+            for ip_config in nic_details.ip_configurations:
+                if ip_config.public_ip_address:
+                    logger.warning(f"VM {vm.name}: Open public port detected on NIC {nic_name}.")
+                    return False
+        logger.info(f"VM {vm.name}: No open public ports detected.")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to check open ports for VM {vm.name}: {e}")
+        return False
 
 
 def check_nsg_rules(resource_group_name, nic_name):
@@ -96,27 +117,33 @@ def check_nsg_rules(resource_group_name, nic_name):
 
 def main():
     try:
-        # List all VMs across all resource groups
-        for vm in compute_client.virtual_machines.list_all():
-            resource_group_name = get_resource_group_name_from_vm_id(vm.id)
-            if not resource_group_name:
-                continue
+        # Iterate through all resource groups
+        resource_groups = get_resource_groups()
+        for rg in resource_groups:
+            logger.info(f"\nProcessing Resource Group: {rg.name}")
 
-            logger.info(f"\nChecking VM: {vm.name} in resource group: {resource_group_name}")
+            # Iterate through all VMs in the resource group
+            vms = list_vms_in_resource_group(rg.name)
+            for vm in vms:
+                logger.info(f"\nChecking VM: {vm.name}")
 
-            compliance = {
-                "Azure Defender for Servers": check_defender_vm(vm),
-                "Disk Encryption": check_disk_encryption(vm, resource_group_name),
-                "NSG Rules": all([
-                    check_nsg_rules(resource_group_name, nic.id.split('/')[-1])
-                    for nic in vm.network_profile.network_interfaces
-                ]),
-            }
+                # Compliance checks
+                compliance = {
+                    "Azure Defender for Servers": check_defender_vm(vm),
+                    "Disk Encryption": check_disk_encryption(vm),
+                    "Open Ports": check_open_ports(vm, rg.name),
+                    "NSG Rules": all([
+                        check_nsg_rules(rg.name, nic.id.split('/')[-1])
+                        for nic in vm.network_profile.network_interfaces
+                    ]),
+                }
 
-            logger.info(f"\nCompliance Report for VM {vm.name}:")
-            for policy, is_compliant in compliance.items():
-                status = "Compliant" if is_compliant else "Non-Compliant"
-                logger.info(f"  {policy}: {status}")
+                # Output compliance report
+                logger.info(f"\nCompliance Report for VM {vm.name}:")
+                for policy, is_compliant in compliance.items():
+                    status = "Compliant" if is_compliant else "Non-Compliant"
+                    logger.info(f"  {policy}: {status}")
+
     except Exception as e:
         logger.error(f"Unexpected error during execution: {e}")
 
