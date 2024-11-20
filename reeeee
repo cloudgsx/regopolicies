@@ -65,19 +65,36 @@ def check_open_ports(vm, resource_group_name):
 
 def check_nsg_rules(resource_group_name, nic_name):
     """Check if NSG rules are compliant for the NIC."""
-    compliance = True
-    nic = network_client.network_interfaces.get(resource_group_name, nic_name)
-    if nic.network_security_group:
+    try:
+        # Get NIC details
+        nic = network_client.network_interfaces.get(resource_group_name, nic_name)
+        
+        # Check if an NSG is associated with the NIC
+        if not nic.network_security_group:
+            print(f"NIC {nic_name} has no NSG associated.")
+            return False
+        
+        # Retrieve the NSG name
         nsg_name = nic.network_security_group.id.split('/')[-1]
+        
+        # Get NSG details
         nsg = network_client.network_security_groups.get(resource_group_name, nsg_name)
+        
+        # Validate NSG rules
+        compliance = True
         for rule in nsg.security_rules:
             if rule.access == "Allow" and rule.direction == "Inbound":
                 print(f"NSG {nsg_name} has an open inbound rule: {rule.name}")
                 compliance = False
-    else:
-        print(f"NIC {nic_name} has no NSG associated.")
-        compliance = False
-    return compliance
+        
+        if compliance:
+            print(f"NSG {nsg_name} is compliant.")
+        return compliance
+
+    except Exception as e:
+        print(f"Error checking NSG for NIC {nic_name}: {e}")
+        return False
+
 
 def main():
     # List all VMs across all resource groups
@@ -89,13 +106,17 @@ def main():
             "Azure Defender for Servers": check_defender_vm(vm),
             "Disk Encryption": check_disk_encryption(vm, resource_group_name),
             "Open Ports": check_open_ports(vm, resource_group_name),
-            "NSG Rules": all([check_nsg_rules(resource_group_name, nic.id.split('/')[-1]) for nic in vm.network_profile.network_interfaces]),
+            "NSG Rules": all([
+                check_nsg_rules(resource_group_name, nic.id.split('/')[-1])
+                for nic in vm.network_profile.network_interfaces
+            ]),
         }
         
         print(f"\nCompliance Report for VM {vm.name}:")
         for policy, is_compliant in compliance.items():
             status = "Compliant" if is_compliant else "Non-Compliant"
             print(f"  {policy}: {status}")
+
 
 
 if __name__ == "__main__":
