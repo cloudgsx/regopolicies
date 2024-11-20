@@ -1,0 +1,21 @@
+def check_disk_encryption(vm):
+    """Check if OS and data disks are encrypted with customer-managed keys."""
+    compliance = True
+
+    # Check OS Disk
+    os_disk = vm.storage_profile.os_disk
+    if not os_disk.managed_disk or not os_disk.managed_disk.disk_encryption_set:
+        print(f"VM {vm.name}: OS Disk is NOT encrypted with a customer-managed key.")
+        compliance = False
+    else:
+        print(f"VM {vm.name}: OS Disk is encrypted with customer-managed key.")
+
+    # Check Data Disks
+    for data_disk in vm.storage_profile.data_disks:
+        if not data_disk.managed_disk or not data_disk.managed_disk.disk_encryption_set:
+            print(f"VM {vm.name}: Data Disk {data_disk.name} is NOT encrypted with a customer-managed key.")
+            compliance = False
+        else:
+            print(f"VM {vm.name}: Data Disk {data_disk.name} is encrypted with customer-managed key.")
+
+    return compliance
