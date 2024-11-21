@@ -1,0 +1,38 @@
+import re
+from tabulate import tabulate
+
+# File path
+file_path = 'path_to_your_file.txt'
+
+# Open and read the file
+with open(file_path, 'r') as file:
+    file_contents = file.readlines()
+
+# Initialize variables
+data = []
+current_category = ""
+
+# Regex pattern to match GUIDs and roles
+guid_pattern = re.compile(r'[a-f0-9-]{36}')
+role_pattern = re.compile(r'//\s*(.+)$')
+
+# Loop through lines to parse the content
+for line in file_contents:
+    line = line.strip()
+    if "assignable_role_guids" in line:  # Identifying category blocks
+        current_category = line.split()[0]
+    elif line and not line.startswith("//") and not line.startswith("http"):  # Ignore comments and URLs
+        guid_match = guid_pattern.search(line)
+        role_match = role_pattern.search(line)
+        if guid_match and role_match:
+            data.append([
+                current_category,  # Category
+                role_match.group(1).strip(),  # Role Name
+                guid_match.group(0).strip()  # GUID
+            ])
+
+# Print the table
+if data:
+    print(tabulate(data, headers=["Category", "Role Name", "GUID"], tablefmt="grid"))
+else:
+    print("No data found in the file!")
