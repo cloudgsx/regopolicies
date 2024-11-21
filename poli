@@ -3,41 +3,47 @@ from azure.mgmt.policyinsights import PolicyInsightsClient
 import logging
 import pandas as pd
 
-# Initialize logging
+# Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Initialize credentials
+# Authenticate using DefaultAzureCredential
 credential = DefaultAzureCredential()
 policy_insights_client = PolicyInsightsClient(credential)
 
-def get_policy_compliance_for_management_group(management_group_name):
-    """Get compliance data for a management group."""
+def get_management_group_compliance(management_group_name):
+    """
+    Fetch compliance data for all policies assigned to a management group.
+    """
     try:
         logger.info(f"Fetching compliance data for management group: {management_group_name}")
 
-        # Summarize policy compliance for the management group
-        results = policy_insights_client.policy_states.summarize_for_management_group(
+        # Summarize compliance at the management group level
+        summaries = policy_insights_client.policy_states.summarize_for_management_group(
             management_group_name=management_group_name
         )
 
-        # Extract summary from the results
-        compliance_summaries = []
-        for summary in results.value:
-            compliance_summaries.append({
+        # Parse compliance summaries
+        compliance_data = []
+        for summary in summaries.value:
+            compliance_data.append({
                 "Policy Name": summary.policy_definition_name,
                 "Policy ID": summary.policy_definition_id,
                 "Total Resources": summary.results.get("totalResources", 0),
                 "Compliant Resources": summary.results.get("compliantResources", 0),
-                "Non-Compliant Resources": summary.results.get("nonCompliantResources", 0),
+                "Non-Compliant Resources": summary.results.get("nonCompliantResources", 0)
             })
-        return compliance_summaries
+
+        return compliance_data
+
     except Exception as e:
-        logger.error(f"Failed to fetch compliance data for management group: {e}")
+        logger.error(f"Error fetching compliance data: {e}")
         return []
 
 def save_to_csv(data, filename="compliance_summary.csv"):
-    """Save compliance summary to a CSV file."""
+    """
+    Save the compliance data to a CSV file.
+    """
     if not data:
         logger.warning("No data to save.")
         return
@@ -50,7 +56,7 @@ def main():
     MANAGEMENT_GROUP_NAME = "98-root"  # Replace with your management group name
 
     logger.info("Starting compliance summary generation...")
-    compliance_data = get_policy_compliance_for_management_group(MANAGEMENT_GROUP_NAME)
+    compliance_data = get_management_group_compliance(MANAGEMENT_GROUP_NAME)
 
     if compliance_data:
         # Print a summary to the console
