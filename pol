@@ -1,0 +1,88 @@
+import logging
+import pandas as pd
+from azure.identity import DefaultAzureCredential
+from azure.mgmt.policyinsights import PolicyInsightsClient
+
+# Initialize Azure clients
+credential = DefaultAzureCredential()
+policy_insights_client = PolicyInsightsClient(credential)
+
+# Set logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+def get_policy_compliance_data(management_group_id):
+    """Retrieve compliance data for a policy initiative at the management group level."""
+    try:
+        logger.info(f"Fetching compliance data for management group: {management_group_id}")
+
+        # Retrieve policy state summaries for the management group
+        results = policy_insights_client.policy_states.summarize_for_management_group(
+            management_group_name=management_group_id
+        )
+
+        return results.value  # List of policies and compliance states
+    except Exception as e:
+        logger.error(f"Failed to fetch policy compliance data: {e}")
+        return []
+
+def summarize_policies(management_group_id):
+    """Summarize policy compliance data for all policies in the initiative."""
+    policies = get_policy_compliance_data(management_group_id)
+
+    if not policies:
+        logger.error("No compliance data found.")
+        return None
+
+    summary_data = []
+
+    for policy in policies:
+        policy_name = policy.policy_definition_name
+        policy_id = policy.policy_assignment_id
+        subscription_id = policy.subscription_id
+
+        compliance_summary = policy.results
+        compliant_resources = compliance_summary.get("compliantResources", 0)
+        non_compliant_resources = compliance_summary.get("nonCompliantResources", 0)
+        total_resources = compliance_summary.get("totalResources", 0)
+
+        # Log details for debugging
+        logger.info(f"Policy: {policy_name}")
+        logger.info(f"  Total resources: {total_resources}")
+        logger.info(f"  Non-compliant resources: {non_compliant_resources}")
+
+        summary_data.append({
+            "Policy Name": policy_name,
+            "Policy Assignment ID": policy_id,
+            "Subscription ID": subscription_id,
+            "Total Resources": total_resources,
+            "Non-Compliant Resources": non_compliant_resources
+        })
+
+    return summary_data
+
+def save_summary_to_file(summary_data, filename="compliance_summary.csv"):
+    """Save summary data to a CSV file."""
+    df = pd.DataFrame(summary_data)
+    df.to_csv(filename, index=False)
+    logger.info(f"Compliance summary saved to {filename}.")
+
+def main():
+    # Replace this with your management group ID
+    MANAGEMENT_GROUP_ID = "98-root"
+
+    logger.info("Starting compliance summary generation...")
+    summary_data = summarize_policies(MANAGEMENT_GROUP_ID)
+
+    if summary_data:
+        # Print to console for visualization
+        print("\nCompliance Summary Table:")
+        print(pd.DataFrame(summary_data))
+
+        # Save to file
+        save_summary_to_file(summary_data)
+    else:
+        logger.warning("No compliance data to summarize.")
+
+if __name__ == "__main__":
+    main()
