@@ -1,0 +1,55 @@
+import json
+import re
+import subprocess
+import pandas as pd
+
+# Path to the uploaded file
+file_path = "/mnt/data/file-Bxam7IYk1G7jQLahLH52ejk5"
+
+def extract_crd_roles(file_path):
+    with open(file_path, 'r') as file:
+        content = file.read()
+    # Use regex to find role names starting with crd_
+    role_names = re.findall(r'name\s*=\s*"([^"]*crd_[^"]*)"', content)
+    return role_names
+
+def get_role_definitions(role_names):
+    role_data = []
+    for role_name in role_names:
+        try:
+            # Run Azure CLI command to get role definition
+            result = subprocess.check_output(
+                f'az role definition list --name {role_name}',
+                shell=True, text=True
+            )
+            definitions = json.loads(result)
+            for definition in definitions:
+                role_data.append({
+                    "Name": definition["roleName"],
+                    "Id": definition["id"],
+                    "Description": definition["description"]
+                })
+        except Exception as e:
+            print(f"Error fetching role definition for {role_name}: {e}")
+    return role_data
+
+def print_table(data):
+    if not data:
+        print("No roles found.")
+        return
+    
+    # Convert data to a pandas DataFrame
+    df = pd.DataFrame(data)
+    
+    # Pretty-print the table as Markdown
+    markdown_table = df.to_markdown(index=False)
+    print("\nCopy this table for Confluence or any text-based documentation:\n")
+    print(markdown_table)
+
+# Main script logic
+role_names = extract_crd_roles(file_path)
+if not role_names:
+    print("No roles found in the file.")
+else:
+    role_definitions = get_role_definitions(role_names)
+    print_table(role_definitions)
