@@ -1,0 +1,47 @@
+import json
+import os
+import subprocess
+from tabulate import tabulate
+
+# Path to the uploaded file
+file_path = "./roles"
+
+def extract_crd_roles(file_path):
+    with open(file_path, 'r') as file:
+        content = file.read()
+    # Extract lines with roles starting with "crd_"
+    crd_roles = [line.split('"')[1] for line in content.splitlines() if line.strip().startswith('"crd_')]
+    return crd_roles
+
+def get_role_definitions(role_names):
+    role_data = []
+    for role_name in role_names:
+        try:
+            # Run Azure CLI command to get role definition
+            result = subprocess.check_output(
+                f'az role definition list --name {role_name}', 
+                shell=True, text=True
+            )
+            definitions = json.loads(result)
+            for definition in definitions:
+                role_data.append({
+                    "Name": definition["roleName"],
+                    "Id": definition["id"],
+                    "Description": definition["description"]
+                })
+        except Exception as e:
+            print(f"Error fetching role definition for {role_name}: {e}")
+    return role_data
+
+def print_table(data):
+    if not data:
+        print("No roles found.")
+        return
+    
+    headers = ["Name", "Id", "Description"]
+    print(tabulate(data, headers=headers, tablefmt="grid"))
+
+# Main script logic
+role_names = extract_crd_roles(file_path)
+role_definitions = get_role_definitions(role_names)
+print_table(role_definitions)
