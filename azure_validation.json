@@ -1,0 +1,106 @@
+package azure_validation
+
+# Deny rules for violations
+deny[msg] {
+    violation := check_nsg_rules(input)
+    msg := sprintf("Network Security Group Violation: %v", [violation])
+}
+
+deny[msg] {
+    violation := check_storage_account(input)
+    msg := sprintf("Storage Account Violation: %v", [violation])
+}
+
+deny[msg] {
+    violation := check_virtual_machine(input)
+    msg := sprintf("Virtual Machine Violation: %v", [violation])
+}
+
+deny[msg] {
+    violation := check_app_service(input)
+    msg := sprintf("App Service Violation: %v", [violation])
+}
+
+deny[msg] {
+    violation := check_key_vault(input)
+    msg := sprintf("Key Vault Violation: %v", [violation])
+}
+
+# Check Network Security Group Rules
+check_nsg_rules(plan) = violations if {
+    resource := plan.plan.resource_changes[_]
+    resource.type == "azurerm_network_security_group"
+    rules := resource.change.after.security_rules
+    violations := [sprintf("Rule '%v' allows SSH from 0.0.0.0/0", [rule.name]) |
+        rule := rules[_]
+        rule.destination_port_range == "22"
+        rule.source_address_prefix == "0.0.0.0/0"
+        rule.access == "Allow"
+        rule.direction == "Inbound"
+    ]
+    count(violations) > 0
+}
+
+# Check Storage Account Configuration
+check_storage_account(plan) = violations if {
+    resource := plan.plan.resource_changes[_]
+    resource.type == "azurerm_storage_account"
+    settings := resource.change.after
+    violations := [
+        "HTTPS traffic not enforced" | not settings.enable_https_traffic_only
+    ]
+    violations = violations + [
+        "Public blob access is allowed" | settings.allow_blob_public_access
+    ]
+    violations = violations + [
+        "Minimum TLS version is not 1.2" | settings.min_tls_version != "TLS1_2"
+    ]
+    count(violations) > 0
+}
+
+# Check Virtual Machine Configuration
+check_virtual_machine(plan) = violations if {
+    resource := plan.plan.resource_changes[_]
+    resource.type == "azurerm_virtual_machine"
+    config := resource.change.after
+    violations := [
+        "Password authentication is enabled" | not config.os_profile_linux_config.disable_password_authentication
+    ]
+    violations = violations + [
+        "Disk encryption is not enabled" | not config.storage_os_disk.encryption_settings.enabled
+    ]
+    violations = violations + [
+        "No system-assigned managed identity" | config.identity.type != "SystemAssigned"
+    ]
+    count(violations) > 0
+}
+
+# Check App Service Configuration
+check_app_service(plan) = violations if {
+    resource := plan.plan.resource_changes[_]
+    resource.type == "azurerm_app_service"
+    config := resource.change.after
+    violations := [
+        "HTTPS is not enforced" | not config.https_only
+    ]
+    violations = violations + [
+        "Authentication is not required" | not config.auth_settings.require_authentication
+    ]
+    violations = violations + [
+        "Minimum TLS version is below 1.2" | config.site_config.min_tls_version != "1.2"
+    ]
+    count(violations) > 0
+}
+
+# Check Key Vault Access Policies
+check_key_vault(plan) = violations if {
+    resource := plan.plan.resource_changes[_]
+    resource.type == "azurerm_key_vault"
+    policies := resource.change.after.access_policies
+    violations := [sprintf("Object ID '%v' has overly permissive access: %v", [policy.object_id, permission]) |
+        policy := policies[_]
+        permission := policy.permissions.keys[_]
+        permission == "Delete"
+    ]
+    count(violations) > 0
+}

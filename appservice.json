@@ -1,0 +1,27 @@
+{
+  "plan": {
+    "resource_changes": [
+      {
+        "type": "azurerm_app_service",
+        "address": "azurerm_app_service.example_app",
+        "change": {
+          "after": {
+            "name": "example-app",
+            "https_only": true,
+            "client_cert_mode": "Required",
+            "auth_settings": {
+              "enabled": true,
+              "default_provider": "AzureActiveDirectory",
+              "require_authentication": true
+            },
+            "site_config": {
+              "min_tls_version": "1.2",
+              "always_on": true,
+              "scm_type": "LocalGit"
+            }
+          }
+        }
+      }
+    ]
+  }
+}

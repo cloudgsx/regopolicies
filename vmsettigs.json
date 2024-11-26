@@ -1,0 +1,33 @@
+{
+  "plan": {
+    "resource_changes": [
+      {
+        "type": "azurerm_virtual_machine",
+        "address": "azurerm_virtual_machine.example_vm",
+        "change": {
+          "after": {
+            "name": "example-vm",
+            "location": "East US",
+            "vm_size": "Standard_DS1_v2",
+            "os_profile": {
+              "admin_username": "azureuser",
+              "computer_name": "examplevm"
+            },
+            "os_profile_linux_config": {
+              "disable_password_authentication": true
+            },
+            "storage_os_disk": {
+              "managed_disk_type": "Premium_LRS",
+              "encryption_settings": {
+                "enabled": true
+              }
+            },
+            "identity": {
+              "type": "SystemAssigned"
+            }
+          }
+        }
+      }
+    ]
+  }
+}

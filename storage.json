@@ -1,0 +1,25 @@
+{
+  "plan": {
+    "resource_changes": [
+      {
+        "type": "azurerm_storage_account",
+        "address": "azurerm_storage_account.example_storage",
+        "change": {
+          "after": {
+            "name": "examplestorage",
+            "account_tier": "Standard",
+            "account_replication_type": "LRS",
+            "enable_https_traffic_only": true,
+            "allow_blob_public_access": false,
+            "min_tls_version": "TLS1_2",
+            "network_rules": {
+              "bypass": ["AzureServices"],
+              "default_action": "Deny",
+              "ip_rules": ["192.168.1.0/24"]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

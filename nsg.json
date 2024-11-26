@@ -1,0 +1,38 @@
+{
+  "plan": {
+    "resource_changes": [
+      {
+        "type": "azurerm_network_security_group",
+        "address": "azurerm_network_security_group.example_nsg",
+        "change": {
+          "after": {
+            "security_rules": [
+              {
+                "name": "allow-ssh",
+                "priority": 100,
+                "access": "Allow",
+                "direction": "Inbound",
+                "source_port_range": "*",
+                "destination_port_range": "22",
+                "source_address_prefix": "0.0.0.0/0",
+                "destination_address_prefix": "*",
+                "protocol": "Tcp"
+              },
+              {
+                "name": "allow-web",
+                "priority": 200,
+                "access": "Allow",
+                "direction": "Inbound",
+                "source_port_range": "*",
+                "destination_port_range": "80",
+                "source_address_prefix": "10.0.0.0/8",
+                "destination_address_prefix": "*",
+                "protocol": "Tcp"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}
