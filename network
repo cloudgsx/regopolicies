@@ -1,0 +1,62 @@
+Azure Network Watcher is a powerful tool that helps monitor, diagnose, and gain insights into Azure network performance and connectivity. Below are detailed use cases for its various features:
+
+1. Network Diagnostics
+Scenario: Troubleshooting connectivity issues between Azure resources.
+Use Case: Identify whether a virtual machine (VM) can connect to a specific endpoint using Connection Troubleshoot. It tests connectivity and provides information about hops and latency.
+Benefit: Quickly identify and resolve connectivity issues between VMs, on-premises resources, or public endpoints.
+2. Network Monitoring
+Scenario: Monitoring the health and performance of the network infrastructure.
+Use Case: Enable Packet Capture on VMs to analyze network traffic for performance bottlenecks or potential security threats.
+Benefit: Gain detailed insights into network behavior, helping identify anomalies or traffic patterns that may need attention.
+3. Security Insights
+Scenario: Enhancing network security posture.
+Use Case: Use NSG (Network Security Group) Flow Logs to analyze traffic patterns, identify unwanted traffic, and ensure compliance with security policies.
+Benefit: Proactively detect and mitigate potential security risks and unauthorized access.
+4. Connectivity Verification
+Scenario: Validating network configurations and routing.
+Use Case: Use IP Flow Verify to test whether traffic is allowed or denied to/from a VM based on the Network Security Groups and User Defined Routes configuration.
+Benefit: Prevent misconfigurations that could lead to downtime or connectivity issues.
+5. Route Optimization
+Scenario: Ensuring optimal routing within your Azure network.
+Use Case: Use Effective Routes to view the effective routes applied to a network interface and ensure traffic is routed as intended.
+Benefit: Debug routing issues and ensure efficient and correct data flow.
+6. DNS Resolution Troubleshooting
+Scenario: Diagnosing DNS resolution failures.
+Use Case: Utilize DNS Query Logs to understand DNS resolution paths and failures for a specific VM.
+Benefit: Quickly pinpoint and resolve issues related to DNS configurations.
+7. Cross-Network Troubleshooting
+Scenario: Diagnosing connectivity between on-premises networks and Azure.
+Use Case: Use Connection Monitor to continuously monitor the availability and latency of connections between Azure VMs, Azure VNets, and on-premises environments.
+Benefit: Ensure reliable hybrid connectivity and detect issues before they impact applications.
+8. Performance Insights
+Scenario: Analyzing latency and throughput of network connections.
+Use Case: Monitor end-to-end network performance using Connection Monitor to assess network speed and reliability for business-critical applications.
+Benefit: Optimize application performance by identifying and addressing latency or throughput issues.
+9. Auditing and Compliance
+Scenario: Meeting compliance requirements for network activity monitoring.
+Use Case: Collect NSG Flow Logs and integrate with Azure Monitor or third-party SIEM tools for auditing network traffic.
+Benefit: Maintain detailed records of network activity for compliance and forensic analysis.
+10. Resource Dependency Mapping
+Scenario: Understanding interdependencies in a networked environment.
+Use Case: Use Topology to visualize the relationships between Azure resources in a virtual network.
+Benefit: Simplify network planning, troubleshooting, and management by understanding resource dependencies.
+11. Application Performance Troubleshooting
+Scenario: Debugging slow or failed application responses.
+Use Case: Use Packet Capture to capture and analyze application-layer data for slow or failing requests.
+Benefit: Drill down into specific packet-level details to uncover application performance issues.
+12. Cost Optimization
+Scenario: Reducing costs associated with network operations.
+Use Case: Analyze NSG Flow Logs and traffic patterns to detect unused or inefficient network paths.
+Benefit: Optimize bandwidth usage and identify underutilized resources, reducing overall costs.
+13. Real-Time Alerts
+Scenario: Responding proactively to network issues.
+Use Case: Configure alerts in Connection Monitor for latency thresholds or packet loss.
+Benefit: Receive notifications of issues in real time, enabling swift corrective action.
+14. Multi-Region Connectivity Monitoring
+Scenario: Ensuring connectivity across multiple Azure regions.
+Use Case: Use Connection Monitor to assess the reliability of cross-region connections in global applications.
+Benefit: Maintain a seamless user experience by ensuring cross-region network reliability.
+15. Migration Validation
+Scenario: Validating network performance post-migration.
+Use Case: Use Connection Monitor and Packet Capture to compare pre- and post-migration performance metrics.
+Benefit: Ensure a successful migration with minimal impact on performance or connectivity.
