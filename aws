@@ -1,0 +1,85 @@
+AWS Rego Files
+KeyVault: Role-Based Access (IAM)
+aws_iam_rbac.rego
+
+package aws_iam_rbac
+
+# Deny if a user has access without the correct IAM role
+deny[msg] {
+    resource := input.plan.resource_changes[_]
+    resource.type == "aws_iam_policy"
+    not resource.change.after.policy_document.Statement[_].Action == "iam:PassRole"
+    msg := sprintf("Unauthorized access: Policy %v does not have the correct permissions.", [resource.change.after.name])
+}
+
+
+
+========================
+
+
+DNS: Route 53 Zone and Record Modifications
+aws_dns_policy.rego
+
+package aws_dns_policy
+
+# Deny modifications to unauthorized zones
+deny[msg] {
+    resource := input.plan.resource_changes[_]
+    resource.type == "aws_route53_zone"
+    allowed_zones := {"example.com", "test.com"}
+    not resource.change.after.name == allowed_zones[_]
+    msg := sprintf("Invalid Route 53 zone modification: %v", [resource.change.after.name])
+}
+
+=================================
+
+Networking: Security Group Validation
+aws_network_security.rego
+
+package aws_network_security
+
+# Deny if an AWS security group allows unrestricted SSH
+deny[msg] {
+    resource := input.plan.resource_changes[_]
+    resource.type == "aws_security_group"
+    rule := resource.change.after.ingress[_]
+    rule.from_port == 22
+    rule.to_port == 22
+    rule.cidr_blocks[_] == "0.0.0.0/0"
+    msg := "Security violation: Unrestricted SSH access (port 22)."
+}
+
+=========================================
+
+Kubernetes Validation (EKS)
+aws_eks_policy.rego
+
+package aws_eks_policy
+
+# Deny if EKS cluster has no RBAC configured
+deny[msg] {
+    resource := input.plan.resource_changes[_]
+    resource.type == "aws_eks_cluster"
+    not resource.change.after.role_arn
+    msg := "EKS RBAC violation: No role assigned to the cluster."
+}
+
+
+===================================================
+
+
+Containers: Trusted Images and Compliance
+aws_containers_compliance.rego
+
+
+package aws_containers_compliance
+
+# Deny if unapproved container images are used in ECS or EKS
+deny[msg] {
+    resource := input.plan.resource_changes[_]
+    resource.type == "aws_ecs_task_definition"
+    image := resource.change.after.container_definitions[_].image
+    not image == "approved-image:latest"
+    msg := sprintf("Unapproved container image: %v", [image])
+}
+
