@@ -1,0 +1,254 @@
+1. AWS KeyVault (IAM) Role-Based Access Test Cases
+Test Input (Valid)
+
+{
+  "plan": {
+    "resource_changes": [
+      {
+        "type": "aws_iam_policy",
+        "address": "aws_iam_policy.valid_policy",
+        "change": {
+          "after": {
+            "policy_document": {
+              "Statement": [
+                {
+                  "Action": "iam:PassRole",
+                  "Effect": "Allow",
+                  "Resource": "*"
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}
+
+Test Input (Invalid)
+{
+  "plan": {
+    "resource_changes": [
+      {
+        "type": "aws_iam_policy",
+        "address": "aws_iam_policy.invalid_policy",
+        "change": {
+          "after": {
+            "policy_document": {
+              "Statement": [
+                {
+                  "Action": "iam:CreateUser",
+                  "Effect": "Allow",
+                  "Resource": "*"
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}
+
+===============================
+
+2. AWS DNS: Route 53 Zone and Record Modifications
+Test Input (Valid)
+
+{
+  "plan": {
+    "resource_changes": [
+      {
+        "type": "aws_route53_zone",
+        "address": "aws_route53_zone.valid_zone",
+        "change": {
+          "after": {
+            "name": "example.com"
+          }
+        }
+      }
+    ]
+  }
+}
+
+
+Test Input (Invalid)
+
+{
+  "plan": {
+    "resource_changes": [
+      {
+        "type": "aws_route53_zone",
+        "address": "aws_route53_zone.invalid_zone",
+        "change": {
+          "after": {
+            "name": "unauthorizedzone.com"
+          }
+        }
+      }
+    ]
+  }
+}
+
+========================================
+
+3. AWS Networking: Security Group Validation
+Test Input (Valid)
+
+{
+  "plan": {
+    "resource_changes": [
+      {
+        "type": "aws_security_group",
+        "address": "aws_security_group.valid_sg",
+        "change": {
+          "after": {
+            "ingress": [
+              {
+                "from_port": 22,
+                "to_port": 22,
+                "cidr_blocks": ["192.168.1.0/24"]
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}
+
+
+
+Test Input (Invalid)
+
+{
+  "plan": {
+    "resource_changes": [
+      {
+        "type": "aws_security_group",
+        "address": "aws_security_group.invalid_sg",
+        "change": {
+          "after": {
+            "ingress": [
+              {
+                "from_port": 22,
+                "to_port": 22,
+                "cidr_blocks": ["0.0.0.0/0"]
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}
+
+
+==================================
+
+4. AWS Kubernetes (EKS) Validation
+Test Input (Valid)
+
+{
+  "plan": {
+    "resource_changes": [
+      {
+        "type": "aws_eks_cluster",
+        "address": "aws_eks_cluster.valid_cluster",
+        "change": {
+          "after": {
+            "role_arn": "arn:aws:iam::123456789012:role/eks-role"
+          }
+        }
+      }
+    ]
+  }
+}
+
+Test Input (Invalid)
+
+{
+  "plan": {
+    "resource_changes": [
+      {
+        "type": "aws_eks_cluster",
+        "address": "aws_eks_cluster.invalid_cluster",
+        "change": {
+          "after": {
+            "role_arn": null
+          }
+        }
+      }
+    ]
+  }
+}
+
+
+====================================================
+
+5. AWS Containers: Trusted Images and Compliance Test Cases
+Test Input (Valid)
+
+{
+  "plan": {
+    "resource_changes": [
+      {
+        "type": "aws_ecs_task_definition",
+        "address": "aws_ecs_task_definition.valid_task",
+        "change": {
+          "after": {
+            "container_definitions": [
+              {
+                "name": "my-container",
+                "image": "approved-image:latest",
+                "environment": [
+                  {
+                    "name": "APP_ENV",
+                    "value": "production"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}
+
+
+Test Input (Invalid)
+
+{
+  "plan": {
+    "resource_changes": [
+      {
+        "type": "aws_ecs_task_definition",
+        "address": "aws_ecs_task_definition.invalid_task",
+        "change": {
+          "after": {
+            "container_definitions": [
+              {
+                "name": "my-container",
+                "image": "unapproved-image:latest",
+                "environment": [
+                  {
+                    "name": "APP_ENV",
+                    "value": "production"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}
+
+====================================
+
+
+
+
+
