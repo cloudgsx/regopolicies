@@ -1,0 +1,168 @@
+azure_keyvault_rbac.rego
+
+KeyVault Role-Based Access Policy
+This policy checks for unauthorized access to an Azure Key Vault based on role-based access control (RBAC).
+
+package azure_keyvault_rbac
+
+# Deny access if there is an unauthorized role access to the Key Vault
+deny[msg] {
+    resource := input.plan.resource_changes[_]
+    resource.type == "azurerm_key_vault"
+    access_policies := resource.change.after.access_policies
+    policy := access_policies[_]
+    not policy.permissions.keys[_] == "Get"
+    msg := sprintf("Unauthorized access: Object ID %v has invalid permissions.", [policy.object_id])
+}
+
+# Allow rules for authorized access to Key Vault
+allow[msg] {
+    resource := input.plan.resource_changes[_]
+    resource.type == "azurerm_key_vault"
+    access_policies := resource.change.after.access_policies
+    policy := access_policies[_]
+    policy.permissions.keys[_] == "Get"
+    msg := sprintf("Authorized access: Object ID %v has valid permissions.", [policy.object_id])
+}
+
+Documentation:
+Purpose: This policy enforces RBAC for Azure Key Vault by ensuring that users with access to the Key Vault have the appropriate permissions (Get in this case).
+Rules: It denies access to users with invalid permissions and allows access to those with proper permission (e.g., Get).
+Test Case:
+Valid: An object with Get permission is allowed.
+Invalid: Any object with no Get permission is denied.
+
+====================================================
+
+DNS: Zone and Record Modifications
+This policy validates whether Azure DNS zones and record modifications are configured correctly.
+
+azure_dns_policy.rego
+
+package azure_dns_policy
+
+# Deny if there are unauthorized DNS record modifications
+deny[msg] {
+    resource := input.plan.resource_changes[_]
+    resource.type == "azurerm_dns_record_set"
+    not resource.change.after.name
+    msg := sprintf("Invalid DNS record modification: %v", [resource.change.after])
+}
+
+# Check that DNS zone is modified according to allowed rules
+valid_zone[msg] {
+    resource := input.plan.resource_changes[_]
+    resource.type == "azurerm_dns_zone"
+    allowed_zones := {"example.com", "test.com"}
+    allowed_zones[_] == resource.change.after.name
+    msg := sprintf("Valid DNS zone modification: %v", [resource.change.after.name])
+}
+
+Documentation:
+Purpose: The policy ensures that DNS records are modified according to defined rules. If the DNS record is not valid or improperly modified, it denies the action.
+Rules: This policy denies changes if DNS record names are missing or invalid and ensures that only valid zones are modified.
+Test Case:
+Valid: A modification to a DNS record within example.com is allowed.
+Invalid: Modifications to DNS records outside the allowed zones (example.com, test.com) are denied.
+
+=============================================================================================
+
+Networking: Security Group/Firewall Validation
+This policy checks the configuration of Network Security Groups (NSGs) and Firewalls to ensure they adhere to the defined security standards.
+
+azure_network_security.rego
+
+package azure_network_security
+
+# Deny insecure security group configurations (open to 0.0.0.0/0 for SSH)
+deny[msg] {
+    resource := input.plan.resource_changes[_]
+    resource.type == "azurerm_network_security_group"
+    rule := resource.change.after.security_rules[_]
+    rule.destination_port_range == "22"
+    rule.source_address_prefix == "0.0.0.0/0"
+    rule.access == "Allow"
+    rule.direction == "Inbound"
+    msg := "Insecure configuration: SSH access open to the world"
+}
+
+
+Documentation:
+Purpose: This policy ensures that SSH (port 22) is not open to the internet (0.0.0.0/0), which is a security vulnerability.
+Rules: Denies configurations that allow SSH access from any source IP.
+Test Case:
+Valid: No SSH access from 0.0.0.0/0.
+Invalid: SSH access is open to 0.0.0.0/0.
+
+=============================================================
+
+Kubernetes: Namespace Isolation, RBAC, Resource Quotas, Pod Security
+This policy checks for multiple Kubernetes security aspects like namespace isolation, RBAC, resource quotas, and pod security policies.
+
+azure_k8s_security.rego
+
+package azure_k8s_security
+
+# Ensure that namespaces are isolated and not shared between different teams
+deny[msg] {
+    resource := input.plan.resource_changes[_]
+    resource.type == "azurerm_kubernetes_cluster"
+    namespace := resource.change.after.namespace
+    not namespace == "team-a" 
+    msg := "Namespace isolation violation: Resource is in an unauthorized namespace."
+}
+
+# Ensure that all pods have security policies (e.g., no privileged containers)
+deny[msg] {
+    resource := input.plan.resource_changes[_]
+    resource.type == "azurerm_kubernetes_pod"
+    container := resource.change.after.containers[_]
+    container.security_context.privileged == true
+    msg := "Security violation: Privileged containers are not allowed."
+}
+
+# Ensure that resource quotas are set in the cluster
+deny[msg] {
+    resource := input.plan.resource_changes[_]
+    resource.type == "azurerm_kubernetes_cluster"
+    not resource.change.after.resource_quota
+    msg := "Resource quota not set for the Kubernetes cluster."
+}
+
+Documentation:
+Purpose: This policy ensures that Kubernetes namespaces are isolated, containers are not privileged, and resource quotas are set.
+Rules:
+Denies resources in unauthorized namespaces.
+Denies privileged containers (which are a security risk).
+Denies the creation of clusters without resource quotas.
+Test Case:
+Valid: A pod in the team-a namespace with no privileged containers and with resource quotas set.
+Invalid: A pod in a shared namespace, with privileged containers, or without resource quotas.
+
+=======================================================
+
+Containers: Trusted Images and Compliance Baselines
+This policy ensures that container images used in Azure are trusted and compliant.
+
+azure_containers_compliance.rego
+
+
+package azure_containers_compliance
+
+# Deny containers using non-approved images
+deny[msg] {
+    resource := input.plan.resource_changes[_]
+    resource.type == "azurerm_container_instance"
+    image := resource.change.after.image
+    not image == "myorg/approved-image"
+    msg := sprintf("Unapproved container image: %v", [image])
+}
+
+# Ensure containers meet compliance baselines (e.g., not running as root)
+deny[msg] {
+    resource := input.plan.resource_changes[_]
+    resource.type == "azurerm_container_instance"
+    container := resource.change.after.containers[_]
+    container.security_context.run_as_user == 0
+    msg := "Compliance violation: Containers should not run as root (user 0)."
+}
