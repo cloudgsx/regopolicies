@@ -1,0 +1,270 @@
+1. Azure Key Vault: Role-Based Access Test Cases
+Test Input (Valid)
+
+{
+  "plan": {
+    "resource_changes": [
+      {
+        "type": "azurerm_key_vault",
+        "address": "azurerm_key_vault.valid_kv",
+        "change": {
+          "after": {
+            "access_policies": [
+              {
+                "object_id": "valid-user-id",
+                "permissions": {
+                  "keys": ["Get", "List"],
+                  "secrets": ["Get", "List"]
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}
+
+
+Test Input (Invalid)
+{
+  "plan": {
+    "resource_changes": [
+      {
+        "type": "azurerm_key_vault",
+        "address": "azurerm_key_vault.invalid_kv",
+        "change": {
+          "after": {
+            "access_policies": [
+              {
+                "object_id": "unauthorized-user-id",
+                "permissions": {
+                  "keys": ["Delete"],
+                  "secrets": ["Get"]
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}
+
+=============================================
+
+2. Azure DNS: Zone and Record Modifications Test Cases
+Test Input (Valid)
+
+{
+  "plan": {
+    "resource_changes": [
+      {
+        "type": "azurerm_dns_zone",
+        "address": "azurerm_dns_zone.valid_zone",
+        "change": {
+          "after": {
+            "name": "example.com"
+          }
+        }
+      }
+    ]
+  }
+}
+
+Test Input (Invalid)
+
+{
+  "plan": {
+    "resource_changes": [
+      {
+        "type": "azurerm_dns_record_set",
+        "address": "azurerm_dns_record_set.invalid_record",
+        "change": {
+          "after": {
+            "name": ""
+          }
+        }
+      }
+    ]
+  }
+}
+
+======================================
+
+3. Azure Network Security Group Test Cases
+Test Input (Valid)
+
+{
+  "plan": {
+    "resource_changes": [
+      {
+        "type": "azurerm_network_security_group",
+        "address": "azurerm_nsg.valid_nsg",
+        "change": {
+          "after": {
+            "security_rules": [
+              {
+                "name": "restrict-ssh",
+                "priority": 100,
+                "access": "Allow",
+                "direction": "Inbound",
+                "source_port_range": "*",
+                "destination_port_range": "22",
+                "source_address_prefix": "10.0.0.0/8",
+                "destination_address_prefix": "*",
+                "protocol": "Tcp"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}
+
+Test Input (Invalid)
+
+{
+  "plan": {
+    "resource_changes": [
+      {
+        "type": "azurerm_network_security_group",
+        "address": "azurerm_nsg.invalid_nsg",
+        "change": {
+          "after": {
+            "security_rules": [
+              {
+                "name": "allow-ssh",
+                "priority": 100,
+                "access": "Allow",
+                "direction": "Inbound",
+                "source_port_range": "*",
+                "destination_port_range": "22",
+                "source_address_prefix": "0.0.0.0/0",
+                "destination_address_prefix": "*",
+                "protocol": "Tcp"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}
+
+==========================================
+
+4. Azure Kubernetes Test Cases
+Test Input (Valid)
+
+{
+  "plan": {
+    "resource_changes": [
+      {
+        "type": "azurerm_kubernetes_cluster",
+        "address": "azurerm_k8s_cluster.valid_cluster",
+        "change": {
+          "after": {
+            "namespace": "team-a",
+            "resource_quota": {
+              "limits.cpu": "10",
+              "limits.memory": "20Gi"
+            }
+          }
+        }
+      }
+    ]
+  }
+}
+
+Test Input (Invalid)
+
+{
+  "plan": {
+    "resource_changes": [
+      {
+        "type": "azurerm_kubernetes_cluster",
+        "address": "azurerm_k8s_cluster.invalid_cluster",
+        "change": {
+          "after": {
+            "namespace": "shared-namespace",
+            "resource_quota": null
+          }
+        }
+      }
+    ]
+  }
+}
+
+===================================
+
+5. Azure Container Instances Test Cases
+Test Input (Valid)
+
+{
+  "plan": {
+    "resource_changes": [
+      {
+        "type": "azurerm_container_instance",
+        "address": "azurerm_container_instance.valid_instance",
+        "change": {
+          "after": {
+            "image": "myorg/approved-image",
+            "containers": [
+              {
+                "security_context": {
+                  "run_as_user": 1000
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}
+
+Test Input (Invalid)
+
+{
+  "plan": {
+    "resource_changes": [
+      {
+        "type": "azurerm_container_instance",
+        "address": "azurerm_container_instance.invalid_instance",
+        "change": {
+          "after": {
+            "image": "unapproved-image",
+            "containers": [
+              {
+                "security_context": {
+                  "run_as_user": 0
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}
+
+
+How to Run the Tests
+Save each JSON input as a file, e.g., keyvault_valid.json, dns_invalid.json, etc.
+
+Run the following command for each test case:
+
+opa eval --format pretty --data azure_policy.rego --input test_case.json "data.azure_keyvault_rbac.deny"
+
+Replace data.azure_keyvault_rbac.deny with the appropriate rule for the resource you're testing:
+
+Key Vault: data.azure_keyvault_rbac.deny
+DNS: data.azure_dns_policy.deny
+NSG: data.azure_network_security.deny
+Kubernetes: data.azure_k8s_security.deny
+Containers: data.azure_containers_compliance.deny
+
+
+
