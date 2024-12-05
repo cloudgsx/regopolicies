@@ -1,0 +1,93 @@
+valid_keyvault.json
+
+
+{
+  "plan": {
+    "resource_changes": [
+      {
+        "type": "azurerm_key_vault_key",
+        "address": "azurerm_key_vault_key.valid_key",
+        "change": {
+          "after": {
+            "name": "valid-key",
+            "key_size": 2048,
+            "key_type": "RSA",
+            "versioned": true,
+            "rotation_policy": {
+              "enabled": true,
+              "lifetime_actions": [
+                {
+                  "action": "rotate",
+                  "trigger": {
+                    "time_after_create": "P180D"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "type": "azurerm_key_vault",
+        "address": "azurerm_key_vault.valid_vault",
+        "change": {
+          "after": {
+            "name": "valid-vault",
+            "role_assignments": ["key-manager-role"]
+          }
+        }
+      }
+    ]
+  }
+}
+
+
+
+
+invalid_keyvault.json
+
+{
+  "plan": {
+    "resource_changes": [
+      {
+        "type": "azurerm_key_vault_key",
+        "address": "azurerm_key_vault_key.invalid_key",
+        "change": {
+          "after": {
+            "name": "invalid-key",
+            "key_size": 1024,
+            "key_type": "EC",
+            "versioned": false,
+            "rotation_policy": {
+              "enabled": false,
+              "lifetime_actions": []
+            }
+          }
+        }
+      },
+      {
+        "type": "azurerm_key_vault",
+        "address": "azurerm_key_vault.invalid_vault",
+        "change": {
+          "after": {
+            "name": "invalid-vault",
+            "role_assignments": []
+          }
+        }
+      }
+    ]
+  }
+}
+
+
+
+test:
+opa eval --format pretty --data azure_keyvault_rbac.rego --input valid_keyvault.json "data.azure_keyvault_rbac.deny"
+opa eval --format pretty --data azure_keyvault_rbac.rego --input invalid_keyvault.json "data.azure_keyvault_rbac.deny"
+
+
+expected output
+
+[  "Key size for Key Vault Key invalid-key is less than 2048 bits.",  "Key type for Key Vault Key invalid-key is not RSA.",  "Key Vault Key invalid-key is not versioned.",  "Key rotation is not enabled for Key Vault Key: invalid-key.",  "Key Vault invalid-vault has no role assignments for key management."]
+
+
