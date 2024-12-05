@@ -1,3 +1,21 @@
+OPA Policy Development:
+
+Create .rego files for KeyVault, DNS, Networking, Kubernetes (Azure and AWS), and Containers to enforce access control and compliance.
+Mock Scenarios:
+
+Design and test scenarios for valid and invalid actions to validate .rego files.
+Policy Validation:
+
+Test policies locally using OPA tools and validate in staging environments.
+Integrate policies into CI/CD pipelines for automated compliance checks.
+Documentation:
+
+Document each policy's purpose, examples, and test results in a Confluence page.
+Integration and Collaboration:
+
+Successfully integrate policies into CI/CD pipelines.
+Policies reviewed and approved by security, infrastructure, and DevOps teams before production deployment.
+
 
 User Story
 Title: Develop and Validate OPA Policies for KeyVault, DNS, Networking, Kubernetes, and Containers
