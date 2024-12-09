@@ -1,0 +1,161 @@
+package azure.vm_size_policy
+
+# Allow VM creation if the size is valid for the specified environment
+allow {
+    input.tags.Environment == "Production"
+    approved_production_vm_sizes[input.vm_size]
+}
+
+allow {
+    input.tags.Environment != "Production"
+    approved_non_production_vm_sizes[input.vm_size]
+}
+
+# Approved VM sizes for production
+approved_production_vm_sizes = {
+    "Standard_D4s_v3",
+    "Standard_D8s_v3"
+}
+
+# Approved VM sizes for non-production
+approved_non_production_vm_sizes = {
+    "Standard_D2s_v3",
+    "Standard_D4s_v3"
+}
+
+# Deny rule for invalid VM sizes
+deny {
+    not allow
+}
+
+==============================
+
+JSON Terraform Mock Test Cases
+
+Test Case: Valid Production VM Size
+Input:
+
+
+{
+  "vm_size": "Standard_D4s_v3",
+  "tags": {
+    "Environment": "Production"
+  }
+}
+
+Expected Output:
+
+
+{
+  "allow": true,
+  "deny": false
+}
+
+
+Test Case: Invalid Production VM Size
+Input:
+
+
+{
+  "vm_size": "Standard_E4s_v3",
+  "tags": {
+    "Environment": "Production"
+  }
+}
+Expected Output:
+
+json
+Copiar código
+{
+  "allow": false,
+  "deny": true
+}
+
+
+Test Case: Valid Non-Production VM Size
+Input:
+
+
+{
+  "vm_size": "Standard_D2s_v3",
+  "tags": {
+    "Environment": "Development"
+  }
+}
+Expected Output:
+
+{
+  "allow": true,
+  "deny": false
+}
+
+
+Test Case: Invalid Non-Production VM Size
+Input:
+
+
+{
+  "vm_size": "Standard_E4s_v3",
+  "tags": {
+    "Environment": "Development"
+  }
+}
+Expected Output:
+
+{
+  "allow": false,
+  "deny": true
+}
+
+
+======================
+
+# Azure VM Size Policy
+
+## Overview
+
+This Rego policy ensures that Azure Virtual Machines are created only with approved VM sizes based on their environment:
+
+- **Production**: Only `Standard_D4s_v3` and `Standard_D8s_v3` sizes are allowed.
+- **Non-Production**: Only `Standard_D2s_v3` and `Standard_D4s_v3` sizes are allowed.
+
+## Policy Implementation
+
+The policy is defined in `policy.rego` and evaluates input against the following criteria:
+
+1. **Environment Tag**:
+   - The VM must specify an environment tag (e.g., `Environment: Production` or `Environment: Development`).
+   
+2. **Allowed VM Sizes**:
+   - The VM size must be in the list of approved sizes for the specified environment.
+
+If a VM fails these criteria, it is denied creation.
+
+## Test Cases
+
+Mock test cases in JSON format validate the policy behavior for different environments and VM sizes. Example scenarios include:
+
+- Valid and invalid VM sizes for **Production**.
+- Valid and invalid VM sizes for **Non-Production**.
+
+Run the tests using the OPA CLI.
+
+## How to Use
+
+### Prerequisites
+
+- [Open Policy Agent (OPA)](https://www.openpolicyagent.org/docs/latest/)
+- JSON input files representing Azure VM resource definitions.
+
+### Running the Policy
+
+1. Save the policy in `policy.rego`.
+2. Save test cases in `test_cases.json`.
+3. Run the tests with the following command:
+   ```bash
+   opa test policy.rego test_cases.json
+
+
+
+opa eval --input input.json --data policy.rego "data.azure.vm_size_policy.allow"
+
