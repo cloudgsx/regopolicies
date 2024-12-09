@@ -285,3 +285,24 @@ Case	Scenario	Expected Outcome
 
 
 opa eval --input case1.json --data azure_policy.rego "data.azure.authorization.allow"
+
+
+
+
+
+
+
+Azure Resource Authorization Policy
+This repository contains an Open Policy Agent (OPA) Rego policy for validating Azure resource creation requests. The policy ensures that only authorized Azure subscriptions and approved creator IDs can create resources.
+
+Overview
+The policy validates the following:
+
+Subscription Authorization: Ensures the Azure subscription (provider) is in the approved list.
+Creator ID Validation: Verifies that the creator_id tag belongs to an approved user.
+Field Presence: Handles missing fields (provider or tags.creator_id) to prevent errors.
+
+
+
+
+
