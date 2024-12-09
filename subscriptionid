@@ -124,3 +124,144 @@ Only authorized subscriptions can create resources.
 Only approved creator IDs are allowed to create resources.
 It is designed to integrate with Azure RBAC and provides audit logging for validation.
 
+
+
+
+=======================================
+
+
+
+
+
+
+Full Set of JSON Mocks for All Cases
+1. Case 1: Valid Subscription and Creator ID
+Description: Authorized subscription and valid creator_id.
+
+
+{
+  "resource": {
+    "azurerm_resource_group": {
+      "example": {
+        "name": "example-resources",
+        "location": "eastus",
+        "tags": {
+          "creator_id": "authorized.user@company.com"
+        },
+        "provider": "azurerm.authorized_subscription"
+      }
+    }
+  }
+}
+
+
+
+2. Case 2: Invalid Subscription
+Description: Unauthorized subscription but valid creator_id.
+Mock:
+
+{
+  "resource": {
+    "azurerm_resource_group": {
+      "example": {
+        "name": "example-resources",
+        "location": "eastus",
+        "tags": {
+          "creator_id": "authorized.user@company.com"
+        },
+        "provider": "azurerm.unauthorized_subscription"
+      }
+    }
+  }
+}
+
+
+3. Case 3: Invalid Creator ID
+Description: Authorized subscription but invalid creator_id.
+Mock:
+
+{
+  "resource": {
+    "azurerm_resource_group": {
+      "example": {
+        "name": "example-resources",
+        "location": "eastus",
+        "tags": {
+          "creator_id": "unauthorized.user@company.com"
+        },
+        "provider": "azurerm.authorized_subscription"
+      }
+    }
+  }
+}
+
+4. Case 4: Both Subscription and Creator ID Invalid
+Description: Unauthorized subscription and invalid creator_id.
+Mock:
+
+{
+  "resource": {
+    "azurerm_resource_group": {
+      "example": {
+        "name": "example-resources",
+        "location": "eastus",
+        "tags": {
+          "creator_id": "unauthorized.user@company.com"
+        },
+        "provider": "azurerm.unauthorized_subscription"
+      }
+    }
+  }
+}
+
+
+5. Case 5: Missing Creator ID Tag
+Description: Authorized subscription but no creator_id tag provided.
+Mock:
+
+{
+  "resource": {
+    "azurerm_resource_group": {
+      "example": {
+        "name": "example-resources",
+        "location": "eastus",
+        "tags": {},
+        "provider": "azurerm.authorized_subscription"
+      }
+    }
+  }
+}
+
+
+6. Case 6: Missing Provider
+Description: No subscription (provider) provided.
+Mock:
+
+{
+  "resource": {
+    "azurerm_resource_group": {
+      "example": {
+        "name": "example-resources",
+        "location": "eastus",
+        "tags": {
+          "creator_id": "authorized.user@company.com"
+        }
+      }
+    }
+  }
+}
+
+
+
+Mapping to Acceptance Criteria
+Case	Scenario	Expected Outcome
+1	Valid subscription and creator ID	Allow
+2	Invalid subscription	Deny
+3	Invalid creator ID	Deny
+4	Both subscription and creator ID invalid	Deny
+5	Missing creator ID	Deny
+6	Missing subscription (provider field)	Deny
+
+
+
+opa eval --input case1.json --data azure_policy.rego "data.azure.authorization.allow"
