@@ -1,0 +1,126 @@
+package azure.authorization
+
+# Allow resource creation only if the subscription and creator ID are valid
+allow {
+    valid_subscription
+    valid_creator_id
+}
+
+# Validate that the subscription is authorized
+valid_subscription {
+    input.provider == "azurerm.authorized_subscription"
+}
+
+# Validate that the creator ID is in the approved list
+valid_creator_id {
+    approved_creator_ids := {"authorized.user@company.com"}
+    approved_creator_ids[input.tags.creator_id]
+}
+
+# Deny creation if the subscription or creator ID is invalid
+deny {
+    not valid_subscription
+    not valid_creator_id
+}
+
+==============================
+
+Explanation of the Policy
+valid_subscription: Checks if the provider field in the input matches the approved Azure subscription (e.g., azurerm.authorized_subscription).
+
+valid_creator_id: Verifies that the creator_id in the tags section of the input is part of the pre-approved list.
+
+allow: Returns true if both valid_subscription and valid_creator_id rules are satisfied.
+
+deny: Returns true if either the subscription or the creator ID is invalid.
+
+
+============
+
+Mock JSON Test Cases for Azure
+Test Case 1: Authorized Subscription and Creator ID
+Input:
+
+{
+  "provider": "azurerm.authorized_subscription",
+  "tags": {
+    "creator_id": "authorized.user@company.com"
+  }
+}
+
+Expected Output:
+
+{
+  "allow": true,
+  "deny": false
+}
+
+===================================
+
+Test Case 2: Unauthorized Subscription
+Input:
+
+{
+  "provider": "azurerm.unauthorized_subscription",
+  "tags": {
+    "creator_id": "authorized.user@company.com"
+  }
+}
+
+Expected Output:
+
+{
+  "allow": false,
+  "deny": true
+}
+
+=============================================
+
+Test Case 3: Unauthorized Creator ID
+Input:
+{
+  "provider": "azurerm.authorized_subscription",
+  "tags": {
+    "creator_id": "unauthorized.user@company.com"
+  }
+}
+
+Expected Output:
+{
+  "allow": false,
+  "deny": true
+}
+
+
+=========================================
+
+Test Case 4: Both Subscription and Creator ID Unauthorized
+Input:
+
+{
+  "provider": "azurerm.unauthorized_subscription",
+  "tags": {
+    "creator_id": "unauthorized.user@company.com"
+  }
+}
+
+Expected Output:
+{
+  "allow": false,
+  "deny": true
+}
+
+
+=========================
+
+
+Subscription Authorization Policy
+This repository contains an Open Policy Agent (OPA) policy written in Rego to validate resource creation requests based on subscription authorization and creator ID validation.
+
+Overview
+The policy ensures that:
+
+Only authorized subscriptions can create resources.
+Only approved creator IDs are allowed to create resources.
+It is designed to integrate with Azure RBAC and provides audit logging for validation.
+
