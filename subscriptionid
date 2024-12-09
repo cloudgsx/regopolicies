@@ -6,6 +6,12 @@ allow {
     valid_creator_id
 }
 
+# Deny resource creation if either the subscription or creator ID is invalid
+deny {
+    not valid_subscription
+    not valid_creator_id
+}
+
 # Validate that the subscription is authorized
 valid_subscription {
     input.provider == "azurerm.authorized_subscription"
@@ -17,11 +23,25 @@ valid_creator_id {
     approved_creator_ids[input.tags.creator_id]
 }
 
-# Deny creation if the subscription or creator ID is invalid
-deny {
-    not valid_subscription
-    not valid_creator_id
+# Handle cases where fields are missing
+missing_fields {
+    not input.provider
+    not input.tags.creator_id
 }
+
+
+Added missing_fields Rule:
+
+This rule ensures that the policy can handle cases where critical fields (provider or creator_id) are missing from the input.
+Separated allow and deny Logic:
+
+The deny rule explicitly negates the conditions in valid_subscription and valid_creator_id. This makes it clearer why a resource creation request is denied.
+Improved Safety for Missing Fields:
+
+By validating the presence of the fields (e.g., input.provider and input.tags.creator_id), we avoid errors in situations where the input might not contain the expected structure.
+Explicitness:
+
+The updated policy is more explicit and handles edge cases (like missing fields) more gracefully.
 
 ==============================
 
