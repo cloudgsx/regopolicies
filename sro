@@ -1,0 +1,86 @@
+To update the story to align with Scrum principles, we need to ensure the following elements are clearly defined and refined:
+
+1. Story Title
+Keep the title clear, concise, and actionable.
+
+Example:
+Attach Empty VM Disk to VM in App L3 Landing Zone
+
+2. Acceptance Criteria
+Acceptance criteria should follow the INVEST principles (Independent, Negotiable, Valuable, Estimable, Small, Testable). They need to be precise and measurable.
+
+Updated Acceptance Criteria:
+
+An empty VM disk is created and attached to the VM as part of the landing zone deployment.
+Documentation updates include:
+Updated design documents.
+Updated repository README file.
+Updated or newly created Confluence pages.
+Testing artifacts (if deferred) should have an identified owner and plan for future execution.
+Clear rollback plan for deployment failures.
+3. Story Description
+Provide context for the story and link it to user needs or business value.
+
+Updated Description:
+As a developer, I need to attach an empty VM disk to a VM in the App L3 Landing Zone to ensure proper allocation of storage resources during deployment, supporting operational requirements and system scalability.
+
+4. Definition of Ready
+Clearly specify the prerequisites for the story to be considered ready for development.
+
+Updated Definition of Ready:
+
+All necessary inputs and dependencies are documented.
+Acceptance criteria are approved by the Product Owner.
+Necessary access permissions for environments are granted.
+Dependencies with other modules (if any) are identified and communicated.
+5. Definition of Done
+Ensure the definition of done aligns with quality and completeness.
+
+Updated Definition of Done:
+
+Code changes are merged, and the pipeline is green.
+Acceptance criteria are met.
+All relevant documentation is updated.
+Story has passed code review and peer review.
+Deployment tested in the staging environment (or deferred with a clear timeline).
+6. Test Plan
+Even if testing is deferred, ensure a clear plan is outlined.
+
+Updated Test Plan:
+
+Identify the specific test cases to validate the VM disk creation and attachment.
+Define the manual or automated tests and assign owners.
+Include rollback validation steps in the test plan.
+7. Story Points
+Scrum principles emphasize team consensus in estimating effort. Ensure the story points are agreed upon during sprint planning.
+
+Updated Story Format:
+Title:
+Attach Empty VM Disk to VM in App L3 Landing Zone
+
+Description:
+As a developer, I need to attach an empty VM disk to a VM in the App L3 Landing Zone to ensure proper allocation of storage resources during deployment, supporting operational requirements and system scalability.
+
+Acceptance Criteria:
+
+An empty VM disk is created and attached to the VM.
+Documentation updates:
+Updated design documents.
+Updated repository README file.
+Updated Confluence pages.
+Testing plan and ownership identified.
+Deployment rollback plan in place.
+Definition of Ready:
+
+Necessary inputs and dependencies documented.
+Acceptance criteria approved.
+Environment permissions granted.
+Dependencies identified and communicated.
+Definition of Done:
+
+Code changes are merged, and the pipeline is green.
+Acceptance criteria are met.
+Relevant documentation updated.
+Code reviewed and approved.
+Deployment tested (or deferred with a timeline).
+This updated story is now concise, testable, and aligned with Scrum principles, ready for sprint discussion and prioritization.
