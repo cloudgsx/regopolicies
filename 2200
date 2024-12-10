@@ -1,0 +1,48 @@
+Title:
+Update Storage-Share Module for Version Bump and Control Evidencing
+
+Description:
+As a DevOps Engineer,
+I want to update the storage-share module to bump its version for business use case control evidencing,
+so that the latest horizon library is utilized, and the module is fully aligned with operational requirements during the CORP2 UAT release.
+
+Acceptance Criteria:
+
+AC1: Publish the storage-share module with the provided instructions.
+AC2: Support ECP OPS team during the CORP2 UAT release.
+AC3: Ensure the relevant documentation is updated, including:
+Design document changes (as applicable).
+Repository README file updates (as applicable).
+Updates or creation of Confluence pages for tracking (as applicable).
+Definition of Ready (DoR):
+
+Dependencies and impacted items identified.
+Access to required tools, resources, and permissions confirmed.
+Clear instructions provided for supporting UAT activities.
+Definition of Done (DoD):
+
+Updated storage-share module is successfully published with the version bump.
+Jenkins files for the module version and CI/CD repository are updated.
+Support provided to the ECP OPS team during UAT without issues.
+All related documentation (design documents, README files, Confluence pages) is reviewed and updated.
+All necessary approvals are obtained.
+Tasks:
+
+Update the storage-share module to bump the version.
+Document the version history and changes in the README file.
+Update Jenkins files for module version and CI/CD repository configuration (TBD).
+Provide necessary support to the ECP OPS team during the CORP2 UAT release.
+Update and review all related documentation, including design documents and Confluence pages.
+Dependencies:
+
+Access to the latest horizon library.
+Confirmation of UAT schedules and requirements from the ECP OPS team.
+Risks:
+
+UAT issues might arise due to incomplete module updates or configuration changes.
+Documentation updates not aligned with UAT timelines could lead to delays.
+Deliverables:
+
+Updated storage-share module with version bump.
+Updated documentation, including design documents, README file, and Confluence pages.
+UAT support successfully provided to the ECP OPS team.
