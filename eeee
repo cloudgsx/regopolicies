@@ -1,0 +1,51 @@
+Title:
+Develop Azure Automation Account Using L3 Template for CADA-Approved Use Case
+
+Description:
+As a Foundations Engineer,
+I want to use the Azure Automation Account L3 Template to provision automation accounts for the CADA-approved “limited use” case,
+so that hybrid worker VM and dependent resources are configured and operational as per requirements.
+
+Acceptance Criteria:
+
+Deploy the automation account with the hybrid worker VM and its dependent resources.
+Validate the deployment by executing the provided test scripts to ensure all permissions for runbook execution are in place.
+Ensure the following documentation is updated as applicable:
+Design document changes.
+Repository README file updates.
+Updates or creation of Confluence pages for tracking and reference.
+Definition of Ready (DoR):
+
+Dependencies and impacted items are identified and confirmed.
+Required permissions and resources (e.g., repository, templates, and tools) are available.
+Test scripts for validation are reviewed and ready to use.
+Definition of Done (DoD):
+
+Azure Automation Account is deployed successfully with all necessary resources, including:
+Hybrid Runbook Worker VM.
+Hybrid Runbook Worker Group.
+Virtual Machine and PE.
+Test scripts confirm all runbook execution permissions are correctly configured.
+All relevant documentation, including design documents, README files, and Confluence pages, is updated.
+Necessary approvals are completed, and the deployment is aligned with CADA-approved use cases.
+Tasks:
+
+Deploy Azure Automation Account using the L3 Template.
+Validate the deployment using the provided test scripts for runbook execution permissions.
+Update the README file in the repository to include details about the deployment.
+Update design documents to reflect the new deployment.
+Update or create Confluence pages to document the setup and usage of the automation account.
+Ensure dependencies such as Hybrid Runbook Worker, Hybrid Runbook Worker Group, and VM configurations are validated and functional.
+Dependencies:
+
+Access to the Azure Automation Account L3 Template and associated resources.
+Required permissions for provisioning resources.
+Risks:
+
+Misconfiguration during deployment may lead to failure in automation account functionality.
+Missing or incomplete documentation updates could impact operational use.
+Deliverables:
+
+Fully deployed and operational Azure Automation Account with hybrid worker VM and associated resources.
+Updated documentation, including README files, design documents, and Confluence pages.
+Validated and approved deployment aligned with CADA-approved use cases.
