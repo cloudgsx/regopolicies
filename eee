@@ -6,20 +6,20 @@ The epic involves enabling and deploying the following Terraform modules as sepa
 
 ECPIC-1589: Add better descriptions to disk-encryption module outputs.
 ECPIC-1796: Terraform Module Testing in QUA/UAT Env - VM Disk.
-ECPIC-1629: Add VM-disk attachment to VM in App L3 Landing Zone.
+ECPIC-1629: Add vm-disk attachment to VM in App L3 Landing Zone.
 ECPIC-1636: Add data classification tag on Terraform ignore changes.
 ECPIC-1872: Validate VM & VMSS after ignoring the changes to Custom Data.
-ECPIC-1982: Re-validate Unit Testing of TFE - keyvault, storage, and Terraform test.
+ECPIC-1892: Re-validate Unit Testing of TFE - azure_virtual_gateway using Terraform test.
 ECPIC-1800: Add optional parameters to load-balancer rule and probe.
+ECPIC-2134: Update keyvault-premium module to publish module in CORP2 using XLR.
 ECPIC-2124: Terraform Module Testing in QUA/UAT Env - Linux VM.
 ECPIC-2125: Terraform Module Testing in QUA/UAT Env - OS Image.
 ECPIC-2126: Terraform Module Testing in QUA/UAT Env - Storage Container.
 ECPIC-2127: Terraform Module Testing in QUA/UAT Env - Storage Table.
 ECPIC-2128: Terraform Module Testing in QUA/UAT Env - Storage Queue.
-ECPIC-2129: Terraform Module Testing in QUA/UAT Env - Express Route Gateway.
 ECPIC-2130: Update OS-image module to publish module in CORP2 using XLR.
-ECPIC-2136: Update keyvault-key module to publish module in CORP2 using XLR.
-ECPIC-2135: Update storage-container module to publish module in CORP2 using XLR.
+ECPIC-2135: Update keyvault-key module to publish module in CORP2 using XLR.
+ECPIC-2136: Update storage-container module to publish module in CORP2 using XLR.
 ECPIC-2137: Update storage-table module to publish module in CORP2 using XLR.
 ECPIC-2138: Update storage-queue module to publish module in CORP2 using XLR.
 ECPIC-2170: Terraform Module Testing in QUA/UAT Env - Keyvault Key.
@@ -29,12 +29,9 @@ ECPIC-2266: EAP CORP2 Promotion Release (04/12) - Naming Convention Terraform Mo
 ECPIC-2273: EAP CORP2 Promotion Release (04/12) - Storage Account Terraform Module Testing.
 ECPIC-2325: Update naming convention module for azurem_monitor_metric_alert.
 ECPIC-2326: Update storage account module to add timeout block.
-ECPIC-2336: Testing Storage Account modules - CORP3/DEV.
-ECPIC-2338: Testing Naming Convention modules - CORP3/DEV.
 ECPIC-2424: EAP Foundational Modules - Regression Testing.
 ECPIC-2425: EAP Foundational Modules - Performance Testing.
-
-
+ECPIC-2437: Terraform Module Testing in QUA/UAT Env - Disk Encryption.
 
 Epic Objective:
 The goal of this epic is to enable and deploy the latest foundational Terraform module versions into the Production PMR (Project Management Repository) to enhance the stability, scalability, and functionality of infrastructure deployment. This includes the validation, testing, and release of multiple foundational modules, ensuring they meet quality standards and production readiness criteria.
