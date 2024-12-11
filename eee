@@ -1,0 +1,38 @@
+Updated Design Details
+The Design Details section should list how the epic's goal will be achieved by breaking it down into specific stories/tasks. Here’s an example based on your uploaded data:
+
+Updated Design Details:
+
+Purpose: Merge the latest foundational service Terraform modules into the Production PMR using Bitbucket.
+Scope: This includes the enablement and deployment of the following Terraform modules:
+ECPIC-1589: Add better descriptions to disk-encryption module outputs.
+ECPIC-1796: Terraform Module Testing in QUA/UAT Env - VM Disk.
+ECPIC-1629: Add vm-disk attachment to VM in App L3 Landing Zone.
+ECPIC-1636: Add data classification to tag on Terraform ignore changes.
+ECPIC-1872: Validate VM & VMSS after ignoring the changes to Custom Data.
+ECPIC-1982: Re-validate Unit Testing of TFE - keyvault, storage, and terraform test.
+ECPIC-2124: Terraform Module Testing in QUA/UAT Env - Linux VM.
+ECPIC-2125: Terraform Module Testing in QUA/UAT Env - OS Image.
+ECPIC-2126: Terraform Module Testing in QUA/UAT Env - Storage Container.
+ECPIC-2127: Terraform Module Testing in QUA/UAT Env - Storage Table.
+ECPIC-2128: Terraform Module Testing in QUA/UAT Env - Storage Queue.
+ECPIC-2129: Terraform Module Testing in QUA/UAT Env - Express Route Gateway.
+Updated Acceptance Criteria
+Each acceptance criterion should reference the completion of one or more linked stories to clearly define when the epic is "done." Here's how the updated Acceptance Criteria might look:
+
+Acceptance Criteria:
+
+Terraform modules for foundational services are published in the Production PMR.
+The following stories must be completed as part of this epic:
+ECPIC-1589: Add better descriptions to disk-encryption module outputs.
+ECPIC-1796: Terraform Module Testing in QUA/UAT Env - VM Disk.
+ECPIC-1629: Add vm-disk attachment to VM in App L3 Landing Zone.
+ECPIC-1636: Add data classification to tag on Terraform ignore changes.
+ECPIC-1872: Validate VM & VMSS after ignoring the changes to Custom Data.
+ECPIC-1982: Re-validate Unit Testing of TFE - keyvault, storage, and terraform test.
+ECPIC-2124: Terraform Module Testing in QUA/UAT Env - Linux VM.
+ECPIC-2125: Terraform Module Testing in QUA/UAT Env - OS Image.
+ECPIC-2126: Terraform Module Testing in QUA/UAT Env - Storage Container.
+ECPIC-2127: Terraform Module Testing in QUA/UAT Env - Storage Table.
+ECPIC-2128: Terraform Module Testing in QUA/UAT Env - Storage Queue.
+ECPIC-2129: Terraform Module Testing in QUA/UAT Env - Express Route Gateway.
