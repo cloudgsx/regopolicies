@@ -33,3 +33,24 @@ ECPIC-2336: Testing Storage Account modules - CORP3/DEV.
 ECPIC-2338: Testing Naming Convention modules - CORP3/DEV.
 ECPIC-2424: EAP Foundational Modules - Regression Testing.
 ECPIC-2425: EAP Foundational Modules - Performance Testing.
+
+
+
+Epic Objective:
+The goal of this epic is to enable and deploy the latest foundational Terraform module versions into the Production PMR (Project Management Repository) to enhance the stability, scalability, and functionality of infrastructure deployment. This includes the validation, testing, and release of multiple foundational modules, ensuring they meet quality standards and production readiness criteria.
+
+Key Outcomes:
+
+Enablement: Publish foundational Terraform modules (e.g., storage, networking, compute, and encryption) in the Production PMR.
+Testing: Perform comprehensive testing across QUA, UAT, and CORP2/DEV environments, including regression and performance validation.
+Updates: Enhance module documentation and output descriptions to improve usability and clarity for end users.
+Deployment: Successfully release updated modules into the CORP2 environment with proper pre-work and support for the planned UAT release.
+Risk Mitigation: Address dependencies, update naming conventions, and resolve known issues to ensure seamless deployment.
+Scope of Work:
+This epic covers the testing, validation, and enablement of the following foundational Terraform modules:
+
+Storage-related modules (e.g., storage-account, storage-container, storage-table).
+Compute modules (e.g., Linux VMs, OS images, VMSS).
+Networking modules (e.g., express-route gateway).
+Encryption and key management modules (e.g., keyvault-premium, disk-encryption).
+Performance and regression testing for all modules.
