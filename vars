@@ -1,0 +1,23 @@
+variable "subscription_id" {
+  description = "The Azure subscription ID"
+  type        = string
+  default     = "mock_subscription_id"
+}
+
+variable "tenant_id" {
+  description = "The Azure tenant ID"
+  type        = string
+  default     = "mock_tenant_id"
+}
+
+variable "resource_group" {
+  description = "The name of the Azure resource group"
+  type        = string
+  default     = "mock_resource_group"
+}
+
+variable "vm_name" {
+  description = "The name of the Azure virtual machine"
+  type        = string
+  default     = "mock_vm_name"
+}
