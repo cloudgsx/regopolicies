@@ -1,0 +1,19 @@
+Your colleague's observation about the backlog story points showing up on the velocity chart is valid in terms of identifying a potential visual or interpretative glitch in the chart. However, the suggestion that it directly impacts velocity calculations might not be entirely accurate, depending on how your velocity is being calculated. Let’s clarify:
+
+Key Points:
+Backlog Story Points on the Velocity Chart:
+
+The backlog story points (180) are displayed, but these are not part of the sprint work unless explicitly assigned to a sprint.
+These points are simply the unworked items sitting in the backlog and don’t directly impact sprint velocity.
+Sprint Reports Are Not Affected:
+
+The velocity is calculated based on committed vs. completed story points per sprint, which are distinct from backlog points.
+As long as the backlog points are not included in sprint commitments, they should not interfere with velocity calculations.
+Chart Design vs. Data Interpretation:
+
+The chart might include backlog points for context or mistakenly display them, but this does not mean they are used in actual velocity calculations.
+If you cross-check with sprint reports (as suggested), the velocity values should align with the committed and completed points only.
+Conclusion:
+Your colleague's comment might stem from misunderstanding how the backlog points are represented in the chart. The actual velocity calculation from sprint reports (which excludes backlog points) is reliable and not impacted by the visual representation in the chart.
+
+If you can show that the committed/completed points in the sprint reports match the calculated velocity (and exclude the backlog), you can confidently explain this to your colleague to clear up the confusion. Let me know if you need help drafting that explanation!
