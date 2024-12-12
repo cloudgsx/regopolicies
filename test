@@ -1,0 +1,41 @@
+go get github.com/gruntwork-io/terratest/modules/terraform
+
+
+terraform_test.go
+
+package test
+
+import (
+    "testing"
+    "github.com/gruntwork-io/terratest/modules/terraform"
+)
+
+func TestTerraformApply(t *testing.T) {
+    // Define the options for your Terraform test
+    terraformOptions := &terraform.Options{
+        // The path to where your Terraform code is located
+        TerraformDir: "./",
+        
+        // Variables to pass to your Terraform code
+        Vars: map[string]interface{}{
+            "subscription_id": "your_subscription_id",
+            "tenant_id":       "your_tenant_id",
+            "resource_group":  "your_resource_group",
+            "vm_name":         "your_vm_name",
+        },
+
+        // Set to true to prevent any changes from being applied
+        PlanOnly: true,
+    }
+
+    // Run Terraform Init and Plan
+    terraform.InitAndPlan(t, terraformOptions)
+}
+
+
+
+
+go mod init terraform_test
+go mod tidy
+
+go test -v
