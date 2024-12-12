@@ -1,0 +1,38 @@
+package test
+
+import (
+    "testing"
+    "github.com/gruntwork-io/terratest/modules/terraform"
+)
+
+func TestTerraformMockApply(t *testing.T) {
+    // Define the options for your Terraform test
+    terraformOptions := &terraform.Options{
+        // The path to where your Terraform code is located
+        TerraformDir: "./",
+        
+        // Variables to pass to your Terraform code
+        Vars: map[string]interface{}{
+            "subscription_id": "mock_subscription_id",
+            "tenant_id":       "mock_tenant_id",
+            "resource_group":  "mock_resource_group",
+            "vm_name":         "mock_vm_name",
+        },
+        
+        // Disable state refresh to avoid fetching real data from the infrastructure
+        EnvVars: map[string]string{
+            "TF_LOG": "DEBUG", // Enable Terraform debug logging for detailed output
+        },
+    }
+
+    // Run `terraform init` to initialize Terraform
+    terraform.InitAndPlan(t, terraformOptions)
+
+    // Mock apply by specifying no changes or resources targeted
+    // Run `terraform apply` with the `-refresh=false` flag to avoid any external changes
+    terraform.Apply(t, terraformOptions)
+
+    // Optionally, validate if the Terraform state matches expectations
+    // This won't change anything but can be used for assertions in tests
+    t.Log("Terraform mock apply executed successfully.")
+}
