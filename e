@@ -19,3 +19,11 @@ resource "azurerm_virtual_machine" "example" {
     }
   }
 }
+
+
+
+Benefits of Using a Module
+Reusability: You can call the remove_vm_identity module for any VM by passing its resource_id.
+Clean Code: Encapsulates the identity removal logic into a module, keeping your main Terraform files clean.
+State Management: Terraform will handle state updates and ensure dependencies are respected.
+Automatic Order: By referencing the VM's id in the module, Terraform enforces that the identity removal runs before VM deletion.
