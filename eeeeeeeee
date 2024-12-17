@@ -1,4 +1,0 @@
-source_image = {
-  name = "Redhat:RHEL:8_10-lvm-gen2:latest"
-  id   = "example-id"
-}
