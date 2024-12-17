@@ -1,0 +1,20 @@
+# Example values for required variables
+
+# General information
+name = "my-resource-name"               # Example: The name of the resource
+location = "eastus"                     # Example: Azure region (like eastus, westus, etc.)
+resource_group_name = "my-rg"           # Example: Azure Resource Group Name
+
+# Networking
+network_interface_name = "nic-01"       # Example: Name for the network interface
+subnet_id = "/subscriptions/<sub-id>/resourceGroups/my-rg/providers/Microsoft.Network/virtualNetworks/my-vnet/subnets/my-subnet"
+
+# Disk Configuration
+os_disk_name = "my-os-disk"             # Example: OS disk name
+disk_encryption_set_id = "/subscriptions/<sub-id>/resourceGroups/my-rg/providers/Microsoft.Compute/diskEncryptionSets/my-disk-encryption"
+
+# Identity
+managed_identity_ids = ["/subscriptions/<sub-id>/resourceGroups/my-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/my-identity"]
+
+# Source Image for VM
+source_image = "Canonical:UbuntuServer:18.04-LTS:latest"  # Example: Image SKU for Ubuntu 18.04
