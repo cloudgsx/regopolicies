@@ -1,0 +1,1 @@
+az vm list-skus --location eastus --query "[?name=='Standard_L8s_v3'].locationInfo[].{Zones:zones}" -o table
