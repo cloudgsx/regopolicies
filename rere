@@ -1,0 +1,9 @@
+echo "Checking capacity for Standard_L8s_v3 in eastus..."
+result=$(az vm list-skus --location eastus --query "[?name=='Standard_L8s_v3' && locationInfo[0].zones != null].{Name:name}" -o json)
+
+if [ -z "$result" ]; then
+  echo "No capacity available for Standard_L8s_v3 in eastus. Halting deployment."
+  exit 1
+else
+  echo "Capacity available for Standard_L8s_v3 in eastus. Proceeding with deployment."
+fi
