@@ -2,7 +2,6 @@ package terraform.azure.dns
 
 # Test Case: Invalid DNS Zone Name
 test_invalid_dns_zone_name {
-    # Mock input data simulating an invalid DNS zone configuration
     input := {
         "planned_values": {
             "root_module": {
@@ -10,7 +9,7 @@ test_invalid_dns_zone_name {
                     {
                         "type": "azurerm_dns_zone",
                         "values": {
-                            "name": "invalid-zone-name",  # Invalid name format
+                            "name": "invalid-zone-name",  # Invalid name
                             "tags": { "environment": "prod" },
                             "resource_group_name": "prod-dns-rg"
                         }
@@ -19,21 +18,25 @@ test_invalid_dns_zone_name {
             }
         }
     }
-    
-    # Call the deny rule and verify it produces the expected output
-    result := data.terraform.azure.dns.deny
-    expected := [{
-        "name": "invalid-zone-name",
-        "resource_group": "prod-dns-rg",
-        "error": "Invalid DNS zone configuration"
-    }]
 
+    # Capture the deny output
+    result := data.terraform.azure.dns.deny
+
+    # Expected result as a list (array)
+    expected := [
+        {
+            "name": "invalid-zone-name",
+            "resource_group": "prod-dns-rg",
+            "error": "Invalid DNS zone configuration"
+        }
+    ]
+
+    # Check for equality
     result == expected
 }
 
 # Test Case: Valid DNS Zone
 test_valid_dns_zone {
-    # Mock input data simulating a valid DNS zone configuration
     input := {
         "planned_values": {
             "root_module": {
@@ -41,7 +44,7 @@ test_valid_dns_zone {
                     {
                         "type": "azurerm_dns_zone",
                         "values": {
-                            "name": "example.prod.company.com",
+                            "name": "example.prod.company.com",  # Valid name
                             "tags": { "environment": "prod" },
                             "resource_group_name": "prod-dns-rg"
                         }
@@ -51,7 +54,9 @@ test_valid_dns_zone {
         }
     }
 
-    # Call the deny rule and ensure no results are returned
+    # Capture the deny output
     result := data.terraform.azure.dns.deny
+
+    # Ensure no violations
     result == []
 }
