@@ -1,0 +1,113 @@
+User Story
+Title
+As an Azure infrastructure admin, I want Terraform to halt VM creation and avoid automatic retries when encountering ZonalAllocationFailed so that state drift does not occur when Azure completes the deployment later.
+
+Description
+When Terraform encounters the ZonalAllocationFailed error, indicating insufficient capacity in a specific availability zone, the VM creation sometimes completes later in Azure. However, Terraform marks the deployment as failed, leading to a state drift issue.
+
+The customer does not want Terraform to retry automatically when this error occurs. Instead, the deployment should fail cleanly, and manual intervention should be required to address the situation.
+
+Acceptance Criteria
+Terraform does not retry VM creation when a ZonalAllocationFailed error is returned.
+Terraform deployment halts cleanly and marks the operation as failed.
+A clear error message is displayed:
+"VM creation failed due to insufficient capacity in the selected zone. Please manually investigate alternative zones or regions."
+Terraform state must not drift from the actual Azure state.
+Deployment logs must clearly indicate:
+Zone attempted.
+Error returned.
+Steps to manually resolve the issue.
+Tasks
+Prevent Automatic Retries:
+Update Terraform configurations to disable retries for ZonalAllocationFailed errors using lifecycle blocks.
+Explicit Error Handling:
+Use a null_resource or local-exec provisioner to stop Terraform gracefully upon encountering the error.
+State Validation:
+Query Azure using the data block (azurerm_linux_virtual_machine) to check if the VM was created successfully.
+Provide manual steps to import the resource into Terraform state if needed.
+Manual Zone Selection:
+Provide an option to deploy the VM manually in alternative availability zones using a variable list (var.zones) to configure specific zones explicitly.
+Logging and Output:
+Log zone attempts, failure details, and remediation steps to assist manual intervention.
+Documentation:
+Include instructions for handling ZonalAllocationFailed errors, importing resources, and validating Azure state.
+Solution Ideas
+1. Prevent Automatic Retries
+Use lifecycle blocks to ensure Terraform halts without retries.
+
+hcl
+Copiar código
+lifecycle {
+  prevent_destroy = true
+  ignore_changes  = [tags]
+}
+2. Explicit Error Logging
+Add a local-exec provisioner or null_resource to log the error and stop Terraform.
+
+hcl
+Copiar código
+resource "null_resource" "vm_retry_monitor" {
+  provisioner "local-exec" {
+    when    = create
+    command = <<EOT
+      echo "ZonalAllocationFailed detected. Please investigate manually."
+      exit 1
+    EOT
+  }
+}
+3. Avoid State Drift
+Query Azure to validate VM creation using the data block:
+
+hcl
+Copiar código
+data "azurerm_linux_virtual_machine" "existing_vm" {
+  name                = "example-vm"
+  resource_group_name = azurerm_resource_group.example.name
+}
+
+output "vm_status" {
+  value = data.azurerm_linux_virtual_machine.existing_vm.provisioning_state
+}
+4. Manual Zone Selection
+Provide manual zone selection as an option to retry deployments explicitly:
+
+hcl
+Copiar código
+variable "zones" {
+  default = ["1", "2", "3"]
+}
+
+resource "azurerm_linux_virtual_machine" "vm" {
+  count              = length(var.zones)
+  availability_zone  = var.zones[count.index]
+  size               = "Standard_L8s_v3"
+}
+5. Resource Import to Fix Drift
+Provide steps to manually import a successfully created VM:
+
+bash
+Copiar código
+terraform import azurerm_linux_virtual_machine.vm <resource_id>
+Definition of Ready (DoR)
+The following conditions must be met before work begins:
+
+Story has clear acceptance criteria, tasks, and solution ideas documented.
+Terraform configurations and scripts are available for modification.
+Test environments are prepared to simulate ZonalAllocationFailed errors.
+Stakeholders approve the solution and manual intervention requirements.
+Definition of Done (DoD)
+Work is complete when:
+
+Terraform halts cleanly without retries on ZonalAllocationFailed.
+Logs capture error details, zone attempts, and remediation steps.
+Terraform state remains consistent with Azure.
+Simulated test cases confirm:
+No retries occur.
+Manual intervention steps work as expected.
+Documentation is updated for stakeholders, including:
+Error handling behavior.
+Manual steps to resolve capacity issues and state drift.
+Risks
+Manual Effort: Customers must manually intervene when allocation failures occur.
+Downtime: Halting Terraform may delay infrastructure provisioning.
+Complex State Management: Without automated retries, frequent failures might require resource imports or state updates.
