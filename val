@@ -1,9 +1,0 @@
-variable "managed_identity_ids" {
-  description = "List of user-assigned managed identities to be assigned to the VM"
-  type        = list(string)
-
-  validation {
-    condition     = length(var.managed_identity_ids) > 0
-    error_message = "You must provide at least one managed identity ID. Managed identity is mandatory for this VM."
-  }
-}
