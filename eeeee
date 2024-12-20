@@ -1,0 +1,9 @@
+variable "managed_identity_ids" {
+  description = "A list of Managed Identity IDs which should be assigned to the Virtual Machine."
+  type        = list(string)
+
+  validation {
+    condition = length(var.managed_identity_ids) > 0 && alltrue([for id in var.managed_identity_ids : id != "" && id != null])
+    error_message = "Each managed identity must be a valid, non-empty string. The list must contain at least one identity."
+  }
+}
