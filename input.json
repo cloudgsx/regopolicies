@@ -1,0 +1,22 @@
+{
+  "resource_changes": [
+    {
+      "type": "azurerm_private_dns_zone",
+      "change": {
+        "after": {
+          "name": "test.vaultcore.azure.net",
+          "resource_group_name": "rg-eus-71148-test"
+        }
+      }
+    },
+    {
+      "type": "azurerm_private_dns_zone",
+      "change": {
+        "after": {
+          "name": "privatelink.vaultcore.azure.net",
+          "resource_group_name": "rg-prod-dns"
+        }
+      }
+    }
+  ]
+}
