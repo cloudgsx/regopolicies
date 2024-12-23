@@ -15,7 +15,7 @@ deny_list := [output |
 
 # Function to validate DNS zone names and resource group organization
 valid_dns_zone(zone) {
-  valid_name := re_match("^privatelink\.[a-zA-Z0-9-]+.vaultcore.azure.net$", zone.name)
+  valid_name := re_match("privatelink\\.[a-zA-Z0-9-]+.vaultcore.azure.net$", zone.name)
   valid_rg_prefix := startswith(zone.resource_group_name, "rg-")
   valid_rg_suffix := contains(zone.resource_group_name, "-dns")
 
