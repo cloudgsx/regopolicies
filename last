@@ -1,0 +1,40 @@
+package terraform.azure.dns
+
+import rego.v1
+
+# Deny rules for DNS configuration
+deny_list := [output |
+    resource := input.resource_changes[_]
+    print("Evaluating resource:", resource)                # Debug resource details
+    resource.change.after != null
+    resource.type == "azurerm_private_dns_zone"
+    not valid_dns_zone(resource.change.after)
+    output := {
+        "name": resource.change.after.name,
+        "resource_group": resource.change.after.resource_group_name,
+        "error": "Invalid DNS zone configuration"
+    }
+]
+
+# Function to validate DNS zone names and resource group organization
+valid_dns_zone(zone) = true if {
+    print("Validating DNS Zone Name:", zone.name)          # Debug DNS name
+    print("Validating Resource Group Name:", zone.resource_group_name)
+    print("DNS Zone Name Validation Result:", is_valid_name(zone.name))
+    print("Resource Group Validation Result:", is_valid_resource_group(zone.resource_group_name))
+    is_valid_name(zone.name)
+    is_valid_resource_group(zone.resource_group_name)
+}
+
+# Validate DNS zone name matches the required pattern
+is_valid_name(name) = true if {
+    valid := regex.match("^privatelink\\.vaultcore\\.azure\\.net$", name)
+    print("DNS Zone Regex Match Result:", valid)           # Debug regex result
+    valid
+}
+
+# Validate resource group name follows the required format
+is_valid_resource_group(resource_group_name) = true if {
+    print("Checking Resource Group Name:", resource_group_name)  # Debug resource group name
+    startswith(resource_group_name, "rg-")
+}
