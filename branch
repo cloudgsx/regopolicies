@@ -1,0 +1,18 @@
+Main Branches Only:
+
+Use only two primary branches: main (or master) and develop.
+main: Always represents the stable, production-ready code.
+develop: Represents the ongoing development. New features and bug fixes are merged here.
+Feature Branches:
+
+Create short-lived branches for features or fixes. Name them descriptively, such as feature-login or bugfix-typo.
+Merge them back into develop when completed and tested.
+Release Branches (Optional):
+
+If releases need stabilization before deployment, create temporary release branches (release-1.0) to freeze features and focus on final testing and bug fixes.
+Hotfixes:
+
+For urgent production bugs, create a hotfix branch directly from main. Once fixed, merge the hotfix into both main and develop.
+Tagging:
+
+Tag releases on the main branch (e.g., v1.0.0) for clarity.
