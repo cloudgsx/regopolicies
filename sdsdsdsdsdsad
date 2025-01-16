@@ -1,0 +1,71 @@
+resource "azurerm_linux_virtual_machine" "vm" {
+  name                  = "example-vm"
+  location              = var.location
+  resource_group_name   = var.resource_group_name
+  size                  = var.size
+  admin_username        = "adminuser"
+  disable_password_authentication = true
+  network_interface_ids = [azurerm_network_interface.example.id]
+
+  os_profile {
+    computer_name = "example"
+  }
+
+  os_profile_linux_config {
+    ssh_keys = [{
+      path     = "/home/adminuser/.ssh/authorized_keys"
+      key_data = var.ssh_key_data
+    }]
+  }
+
+  lifecycle {
+    # Prevent Terraform from creating the resource if the size is invalid
+    prevent_destroy = local.is_valid_size == false
+  }
+}
+
+
+output "validation_check" {
+  value = local.is_valid_size
+  description = "Validate the VM size"
+}
+
+# Explicitly fail the plan if the size is invalid
+resource "azurerm_plan_check" "validation" {
+  size_is_valid = local.is_valid_size
+}
+
+
+
+
+
+
+resource "azurerm_linux_virtual_machine" "vm" {
+  name                  = "example-vm"
+  location              = var.location
+  resource_group_name   = var.resource_group_name
+  size                  = var.size
+  admin_username        = "adminuser"
+  disable_password_authentication = true
+  network_interface_ids = [azurerm_network_interface.example.id]
+
+  os_profile {
+    computer_name = "example"
+  }
+
+  os_profile_linux_config {
+    ssh_keys = [{
+      path     = "/home/adminuser/.ssh/authorized_keys"
+      key_data = var.ssh_key_data
+    }]
+  }
+
+  dynamic "precondition" {
+    for_each = local.is_valid_size ? [] : ["size"]
+
+    content {
+      condition     = false
+      error_message = "VM size ${var.size} is not valid. Allowed sizes: ${module.compute_skus.vms.details.all}"
+    }
+  }
+}
