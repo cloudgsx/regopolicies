@@ -1,0 +1,21 @@
+module "compute_skus" {
+  source   = "./modules/skus"
+  location = var.location
+}
+
+# Validate if the VM size is valid
+locals {
+  is_valid_size = contains(module.compute_skus.vms.details.all, var.size)
+}
+
+# Output the validation result
+output "validation_check" {
+  value       = local.is_valid_size
+  description = "Indicates if the VM size is valid"
+}
+
+output "validation_error_message" {
+  value       = "Invalid VM size '${var.size}'. Allowed sizes are: ${join(", ", module.compute_skus.vms.details.all)}"
+  condition   = !local.is_valid_size
+  description = "Error message to display if VM size is invalid"
+}
