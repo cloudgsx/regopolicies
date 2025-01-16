@@ -1,0 +1,33 @@
+module "compute_skus" {
+  source   = "./modules/skus"
+  location = var.location
+}
+
+# Validate if the VM size is valid
+locals {
+  is_valid_size = contains(module.compute_skus.vms.details.all, var.size)
+}
+
+# Main VM Resource
+resource "azurerm_linux_virtual_machine" "vm" {
+  count = local.is_valid_size ? 1 : 0  # Create the VM only if valid
+
+  name                  = "example-vm"
+  location              = var.location
+  resource_group_name   = var.resource_group_name
+  size                  = var.size
+  admin_username        = "adminuser"
+  disable_password_authentication = true
+  network_interface_ids = [azurerm_network_interface.example.id]
+
+  os_profile {
+    computer_name = "example"
+  }
+
+  os_profile_linux_config {
+    ssh_keys = [{
+      path     = "/home/adminuser/.ssh/authorized_keys"
+      key_data = var.ssh_key_data
+    }]
+  }
+}
