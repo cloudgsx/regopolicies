@@ -1,0 +1,85 @@
+Observations
+Too Many Nested Sections: The documentation has deep nesting, making it harder to navigate.
+Deprecated Pages Not Clearly Marked: There's a section for deprecated pages, but it's mixed with active documentation.
+Lack of Categorization: Items such as onboarding, architectural decisions, and compliance-related documents appear unorganized.
+No Clear Naming Conventions: Some pages have unclear titles, like "New User GES - Request Namespace Access," which may not be intuitive for users.
+Redundant or Similar Pages: There are multiple onboarding-related pages, which might create confusion.
+
+
+
+Recommendations for Improvement
+1. Improve Navigation with a Clearer Hierarchy
+Reduce the depth of nested sections to make navigation easier.
+Use clear, high-level categories such as:
+Getting Started (Onboarding)
+Architecture & Design
+Platform & Deployment
+Security & Compliance
+Deprecated & Archived Content
+Move "Deprecated Pages" to a separate archive with clear labels.
+2. Establish Naming Conventions
+Standardize document titles, e.g., instead of "New User Azure CLI Installation/Setup (Mac)," use "Azure CLI Setup (Mac) - Onboarding Guide."
+Use prefixes for consistency:
+[Guide] for step-by-step tutorials
+[Reference] for technical details
+[Policy] for governance documents
+3. Merge or Eliminate Redundant Documents
+Combine similar onboarding pages into a single comprehensive guide.
+Use FAQs to cover common onboarding issues rather than having multiple documents.
+Consolidate authentication-related documents under a single security guide.
+4. Improve Searchability with Tags & Indexing
+Implement tagging for key topics (e.g., Terraform, Azure CLI, Onboarding).
+Create a master index page with links to important documentation.
+5. Add Summaries for Each Section
+Each major section should have a brief summary explaining what it contains.
+Use FAQs or Quick Links at the top of each major category.
+6. Review & Archive Old Documentation Regularly
+Clearly mark deprecated pages (e.g., with a banner or different text color).
+Set a review schedule (e.g., every 6 months) to archive outdated content.
+
+
+
+Enterprise Azure Platform Documentation Structure
+1️⃣ Getting Started (Onboarding)
+[Guide] New User Onboarding Overview
+[Guide] Access Requests & Permissions
+[Guide] Setting Up Your Development Environment
+Azure CLI Setup (Mac)
+Azure CLI Setup (Windows)
+Terraform Setup
+[FAQ] Common Onboarding Issues & Fixes
+[Checklist] First-Day Tasks for Developers
+2️⃣ Architecture & Design
+[Reference] ECP NextGen Platform Overview
+[Reference] Cloud Foundations & Best Practices
+[Reference] Terraform Module Naming Conventions
+[Decision Log] Key Architectural Decisions
+[Design Doc] Platform CI/CD Design
+3️⃣ Platform & Deployment
+[Guide] Deploying Applications on Azure
+[Guide] Managing Landing Zones & Workspaces
+[Reference] ECP NextGen Code Structure
+[Reference] AppProxy Rules & Security Policies
+[Guide] Cloud Transition Plan & Migration Strategies
+[Guide] Automated Deployment Pipelines
+4️⃣ Security & Compliance
+[Policy] Authentication & API Security Guidelines
+[Guide] GES API Authentication
+[Guide] Requesting Namespace Access
+[Checklist] Compliance Requirements for Deployments
+[Audit] Security Controls Validation
+5️⃣ Tools & Troubleshooting
+[Guide] Using IDEs & Editors for Cloud Development
+[Guide] Debugging Terraform Issues
+[FAQ] Troubleshooting Common Errors
+[Reference] Monitoring & Logging Best Practices
+6️⃣ Deprecated & Archived Content
+❌ [Deprecated] Older Access Request Procedures
+❌ [Deprecated] Onboarding Archive (Old Methods)
+❌ [Deprecated] Cloud 2.0 Transition Notes
+📌 [Archive] Historical Key Decisions & Docs
+✅ Key Benefits of This Structure
+✔ Flat and easy to navigate (max 2 levels deep).
+✔ Consistent naming conventions ([Guide], [Reference], etc.).
+✔ Clear separation of onboarding, architecture, platform, security, and tools.
+✔ Deprecated content is clearly marked and stored separately.
