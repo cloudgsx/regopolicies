@@ -1,0 +1,111 @@
+Standard Guide for Writing Effective Acceptance Criteria (ACs)
+
+Objective
+
+This guide provides a standardized approach to defining clear, testable, and actionable Acceptance Criteria (ACs) for epics and user stories. By following this framework, teams can ensure consistency, compliance, and alignment with best practices.
+
+1. Key Principles of Well-Defined Acceptance Criteria
+
+Clarity: Use clear and unambiguous language.
+
+Conciseness: Keep statements brief while maintaining necessary details.
+
+Testability: Ensure each AC can be verified through automation or manual validation.
+
+Consistency: Follow the Given-When-Then structure for uniformity.
+
+Independence: Each AC should focus on a single, self-contained condition.
+
+2. The Given-When-Then Framework
+
+Each Acceptance Criterion should follow this structured approach:
+
+Given: Establishes the preconditions or initial context.
+
+When: Describes the trigger or event that occurs.
+
+Then: Defines the expected outcome or system behavior.
+
+Example:
+
+❌ Poorly Defined AC:
+
+"Ensure the system updates the network settings."
+
+✅ Well-Defined AC:
+
+Given that networking configurations are pre-defined,
+
+When new infrastructure is deployed,
+
+Then all network settings should be applied as per security policies and governance rules.
+
+3. Standardized AC Writing Guidelines
+
+3.1. Avoid Ambiguity
+
+❌ "The system should optimize performance."
+
+✅ "Given that the system handles 1000+ concurrent users, when a performance test is executed, then response time should not exceed 200ms."
+
+3.2. Eliminate Redundant Statements
+
+Combine ACs that reference the same dependencies or outcomes.
+
+3.3. Ensure Testability
+
+Use measurable criteria (e.g., response times, access permissions, logs, provisioning success rates).
+
+3.4. Maintain Consistent Formatting
+
+All ACs must follow the Given-When-Then structure.
+
+3.5. Define Dependencies Explicitly
+
+Clearly outline if the AC is dependent on another process, configuration, or policy.
+
+4. Standardized AC Categories & Templates
+
+4.1. Infrastructure Deployment ACs
+
+Given that infrastructure configurations are stored in version control,
+
+When a new environment is deployed,
+
+Then all components should be provisioned using the latest approved configurations.
+
+4.2. Security & Compliance ACs
+
+Given that security policies require encryption of sensitive data,
+
+When a new database instance is created,
+
+Then encryption at rest should be enabled by default.
+
+4.3. Networking ACs
+
+Given that predefined firewall rules exist,
+
+When an application instance is launched,
+
+Then the instance should inherit and enforce all relevant security policies.
+
+4.4. CI/CD & Automation ACs
+
+Given that a CI/CD pipeline is in place,
+
+When a new application version is committed to the repository,
+
+Then automated testing and deployment should be triggered.
+
+5. Checklist for Reviewing ACs
+
+✅ Is each AC written using the Given-When-Then structure?✅ Is the language clear, precise, and actionable?✅ Can the AC be tested and validated?✅ Is each AC focused on a single outcome?✅ Have dependencies been clearly defined?✅ Is there redundancy between ACs? If so, can they be combined?
+
+6. Continuous Improvement
+
+Regularly review ACs as part of backlog grooming and sprint planning.
+
+Ensure team alignment on how ACs are written and validated.
+
+Maintain a repository of standardized templates to improve efficiency.
