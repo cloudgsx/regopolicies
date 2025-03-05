@@ -1,0 +1,39 @@
+As an Azure Infrastructure Engineer, I want to investigate and find a solution to the Terraform error "The resource operation completed with terminal provisioning state" when provisioning a VM in Azure, so that I can ensure successful and consistent provisioning without failures.
+
+Problem Statement
+Terraform fails to provision a VM in Azure with the following error message:
+
+"The resource operation completed with terminal provisioning state: 'Failed'."
+The failure is related to resource identity operations and a conflict error indicating that the resource already exists or a pending delete operation is causing the failure.
+Tasks
+Investigate the root cause
+
+Check Azure Activity Logs and Terraform state to identify conflicts.
+Verify if a previous delete operation is still pending.
+Confirm if the resource identity permissions are correctly configured.
+Examine Azure Resource Manager (ARM) logs for additional failure insights.
+Reproduce the Issue
+
+Attempt to provision the same VM using Terraform in a controlled environment.
+Monitor logs and identify any patterns related to the error.
+Identify Possible Solutions
+
+Ensure proper cleanup of orphaned resources before provisioning.
+Adjust Terraform configurations to avoid conflicts.
+Implement a retry mechanism for provisioning attempts.
+Check for dependency issues related to identity operations.
+Implement and Validate Fixes
+
+Apply the identified solutions and test VM provisioning.
+Verify the resolution across multiple test runs.
+Update Terraform scripts if necessary to prevent similar issues.
+Document Findings and Update Runbooks
+
+Summarize the issue, root cause, and the applied fix.
+Update Terraform best practices documentation.
+Share learnings with the team for future prevention.
+Acceptance Criteria
+ The root cause of the error is identified and documented.
+ A validated solution is implemented and tested successfully.
+ Terraform successfully provisions the VM without encountering the terminal provisioning error.
+ Documentation and Terraform scripts are updated with the best practices to prevent recurrence.
