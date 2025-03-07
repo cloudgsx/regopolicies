@@ -1,5 +1,0 @@
-You’re absolutely right that we have flexibility in how we divide the address space. However, ensuring that subnets are structured properly is essential for scalability, security, and operational efficiency.
-
-The networking team is responsible for designing these allocations to ensure consistency, avoid fragmentation, and maintain compliance with best practices. Assigning subnets arbitrarily could lead to overlapping ranges, wasted IPs, or future constraints that could have been avoided with proper planning.
-
-For this particular case, our goal was to allocate one /27 and two /28s in a structured way. That’s why the original proposal follows a logical order, ensuring that the largest subnet is placed first, followed by the smaller ones. This avoids conflicts and aligns with subnetting best practices.
