@@ -1,0 +1,51 @@
+An Azure Landing Zone is a set of pre-configured guidelines, best practices, and resources that help organizations set up a secure, scalable, and well-managed Azure environment. It serves as a foundation for cloud adoption, ensuring that workloads are deployed in a consistent and governed manner.
+
+🔹 Key Aspects of an Azure Landing Zone
+Governance & Compliance – Implements policies, security controls, and compliance standards.
+Networking – Sets up Virtual Networks (VNets), Subnets, and connectivity (ExpressRoute, VPN).
+Identity & Access Management (IAM) – Defines role-based access control (RBAC) and integrates with Azure Active Directory (AAD).
+Security – Implements Azure Security Center, encryption, and monitoring tools.
+Resource Organization – Establishes management groups, subscriptions, and resource groups for structured cloud environments.
+Monitoring & Logging – Uses Azure Monitor, Log Analytics, and Sentinel for insights and security analysis.
+Scalability & Cost Management – Ensures cost control through budgets, tagging strategies, and reserved instances.
+🔹 Types of Azure Landing Zones
+Azure offers different types of landing zones based on organizational needs:
+
+Enterprise-Scale Landing Zone – Best for large organizations with a structured cloud strategy.
+CAF (Cloud Adoption Framework) Ready Landing Zone – Aligns with Microsoft’s Cloud Adoption Framework.
+Custom Landing Zones – Tailored to specific business needs and regulatory requirements.
+🔹 Benefits of Azure Landing Zones
+✅ Faster Cloud Adoption – Reduces the time needed to set up Azure environments.
+✅ Security & Compliance – Implements Zero Trust principles for a secure cloud setup.
+✅ Operational Excellence – Automates deployments with Infrastructure as Code (IaC) like Terraform or Bicep.
+✅ Scalability & Cost Optimization – Prepares the environment for future expansion without over-provisioning.
+
+
+
+The diagram outlines the Landing Zone Order of Execution for creating Azure Landing Zones using Terraform. It is divided into two main sections:
+
+1️⃣ Platform Landing Zones (Core Infrastructure Setup)
+This section defines the foundational cloud environment, including role-based access control (RBAC), networking, security policies, and key vaults:
+
+Organization & IAM Setup:
+Creates management groups, role definitions, and role assignments for identity and access management.
+Implements Privileged Identity Management (PIM) for eligible role assignments.
+Governance & Security:
+Policy L1: Defines Azure Policy Assignments to enforce compliance.
+FinOps L1: Sets up cost management, monitoring, and alerts.
+Networking & Connectivity:
+Connectivity Hub L1 & L2: Establishes Private DNS, Express Route Gateway, VNET Peering, and NSGs.
+Key Vault & Resource Locks:
+Key Vault L1 & L2: Manages encryption keys and storage for platform security.
+Operations L1: Implements resource locks to protect key infrastructure.
+2️⃣ Application Landing Zones (User Infrastructure Deployment)
+This section focuses on setting up environments for application teams:
+
+Application L1:
+Assigns resource groups and role permissions for app teams.
+Creates VNET peering between application landing zones if needed.
+Application L2:
+Deploys Key Vaults, Private DNS, and networking components for applications.
+Ensures encryption and security compliance using Terraform-managed infrastructure.
+User Landing Zones (L3):
+Hosts approved user resources deployed using Terraform modules.
