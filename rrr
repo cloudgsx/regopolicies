@@ -1,0 +1,117 @@
+Azure Infrastructure Diagram Overview
+
+High-Level Architecture
+
+The Azure infrastructure diagram presents a structured view of various Azure services and components, clearly segmented into three main zones:
+
+GIS Zone
+
+Platform Landing Zone
+
+Application Landing Zone
+
+1. GIS Zone (Tenant-specific)
+
+This zone handles log analytics, storage, security, and monitoring.
+
+Resource Group: CSOM Resource Group
+
+Log Analytics Workspace
+
+Log Analytics Cluster
+
+Storage Account
+
+Key Vault (Securely integrated)
+
+Alerts for monitoring
+
+2. Platform Landing Zone
+
+This is a central zone connecting various subnets and resources:
+
+ExpressRoute Connectivity:
+
+Express Route Circuit is located within the Hub Resource Group to enable secure connectivity.
+
+The Express Route Gateway connects via a Public IP and enables private endpoint connections.
+
+Financial Operations:
+
+Fin Ops Resource Group
+
+Cost Alerts
+
+Dashboards and Queries
+
+Monitoring Alerts
+
+Infrastructure Resources:
+
+Dedicated resource groups for managing infrastructure networking and storage:
+
+Infra Resource Group
+
+Infra VNET:
+
+Infra Subnet with NSG protection
+
+Private Endpoints for secure communication
+
+Storage Account for network flow logs
+
+Platform Key Vault secured separately for credentials management.
+
+Networking and DNS:
+
+Azure Private DNS Zone for secure internal DNS resolution.
+
+Established links and peering with application-specific VNets.
+
+3. Application Landing Zone
+
+This zone hosts application-specific resources segmented into foundational and user-specific groups:
+
+Foundational Platform Resource Group:
+
+Storage Account
+
+Data Subnet with Private Endpoints and NSG
+
+Key Vault for secure key management
+
+Disk Encryption Set
+
+Network Flow Logs
+
+User Resource Group:
+
+Application VNET divided into:
+
+Business Subnet:
+
+VM Scale Sets
+
+NSG secured
+
+Web Subnet:
+
+Load Balancer
+
+NSG secured
+
+Peered connectivity to central Private DNS for seamless integration and internal communication.
+
+Security & Monitoring
+
+Each subnet is secured with Network Security Groups (NSG).
+
+Use of Key Vault for centralized secrets and key management across zones.
+
+Integration of Azure Defender for threat detection and prevention.
+
+Connectivity
+
+Secure connectivity across zones managed through ExpressRoute, Private Link Scopes, and peered VNets.
+
+Network flow logging and alerts in place for proactive monitoring.
