@@ -1,0 +1,73 @@
+Goal
+
+This document outlines the implementation details and execution flow for the Security Key Vault Level 2 Landing Zone within the NextGen environment.
+
+Strategic Fit
+
+Azure Key Vault addresses critical security and management needs, including:
+
+Secrets Management: Securely storing tokens, passwords, certificates, API keys, and other sensitive data.
+
+Key Management: Generating and managing encryption keys securely.
+
+Certificate Management: Managing public and private certificates for Azure and integrated resources.
+
+Azure Key Vault offers two service tiers:
+
+Standard: Software-based key encryption.
+
+Premium: Hardware Security Module (HSM)-based key encryption.
+
+Overview
+
+The Security Key Vault Level 1 and Level 2 templates facilitate Key Vault resource setup for Customer-Managed Keys (CMK) enablement.
+
+Key Vault provisioning occurs post Connectivity L1 and L2 Landing Zone resource creation, leveraging subnet IDs from the Connectivity Infrastructure VNet to establish private endpoints.
+
+Prerequisites
+
+Contributor-level permissions at cross-subscription level for Azure provisioning.
+
+Dedicated Terraform Enterprise (TFE) workspace.
+
+TFE backend setup.
+
+GIS subscription ID for Log Analytics Workspace.
+
+Architecture Summary
+
+The architecture spans multiple landing zones interconnected securely via Azure private links, private endpoints, and ExpressRoute circuits:
+
+Platform Landing Zone
+
+Hub Resource Group: Manages core networking with ExpressRoute, gateway subnets, and private endpoints.
+
+Infra Resource Group: Manages infrastructure subnets, storage accounts, and private endpoints.
+
+FinOps Resource Group: Manages financial operations, dashboards, cost alerts, and analytics.
+
+Platform Key Vault Resource Group: Dedicated key management.
+
+Application Landing Zone
+
+Foundational Platform Resource Group: Contains storage, key vault, disk encryption, and network flow log management.
+
+User Resource Group: Hosts business and web subnets, virtual machines/scales sets, load balancers, and network security.
+
+GIS Tenant
+
+Centralized monitoring and analytics with Log Analytics workspace, clusters, and alerts.
+
+Diagram Highlights
+
+Private endpoints ensure secure internal communication.
+
+Azure Private DNS Zones resolve private endpoints.
+
+ExpressRoute provides secure hybrid connectivity.
+
+Azure Defender ensures continuous security compliance monitoring.
+
+Centralized log analytics facilitate cross-environment monitoring.
+
+The architecture enhances security, simplifies key management, and maintains compliance through standardized infrastructure deployment and centralized monitoring.
