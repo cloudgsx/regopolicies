@@ -39,3 +39,19 @@ SA Module Registry and GitHub Reference
 TFE Registry: AzureRM Storage Account Resource
 
 GitHub Issue: terraform-azurerm-storage-account Issue #17
+
+
+Component	Issue Summary	Resolution	TFE Run Link
+Org_L1	No Issues Found	—	—
+IAM_L1	skip_provider_registration = true is deprecated	Use resource_provider_registrations instead	Run Link
+IAM_L0	No Issues Found	—	—
+Policy_L1	No Issues Found	—	—
+ConnHub_L1	No Issues Found	—	—
+ConnHub_L2	enable_https_traffic_only deprecated as of AzureRM 3.114.0	Use https_traffic_only_enabled	Run 1, Run 2
+App_L1	No Issues Found	—	—
+App_L2	Same as ConnHub_L2 issue (enable_https_traffic_only deprecated)	Use https_traffic_only_enabled	Run 1, Run 2
+App_L1_Extra_Peering	No Issues Found	—	—
+App_L3	1. enable_accelerated_networking changed to accelerated_networking_enabled in VM module
+2. enable_https_traffic_only changed to https_traffic_only_enabled in SA module	Updated variable names in affected modules	Run Link
+Org_L2	No Issues Found	—	—
+Security_KeyVault_L1	No Issues Found	—	—
