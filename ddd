@@ -1,0 +1,41 @@
+Terraform Upgrade 4.0 – Code Changes in Landing Zones and Templates
+Created by: Anu Nadig
+Contributors: Naga Jampana
+Date: March 26, 2025
+Status: Draft
+
+Solution Description
+This document outlines the required code changes for Landing Zones and modules during the upgrade to Terraform 4.0.
+
+Introduction
+The purpose of this document is to serve as a comprehensive guide for implementing code modifications across various landing zones and modules due to the upgrade from Terraform 3.x to Terraform 4.0.
+
+Change Summary
+
+Deprecation Details & Reference
+skip_provider_registration
+Issue: This property is deprecated and will be removed in AzureRM provider v5.0.
+
+Resolution: Replace with resource_provider_registrations.
+
+Reference: Terraform AzureRM 4.0 Upgrade Guide
+
+New Property: resource_provider_registrations
+Supported values:
+
+core
+
+extended
+
+all
+
+none (equivalent to deprecated skip_provider_registration = true)
+
+legacy
+
+Also supports resource_providers_to_register for custom RP lists.
+
+SA Module Registry and GitHub Reference
+TFE Registry: AzureRM Storage Account Resource
+
+GitHub Issue: terraform-azurerm-storage-account Issue #17
