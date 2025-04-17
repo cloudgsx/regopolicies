@@ -1,0 +1,88 @@
+Architecture Design Overview
+The following diagram illustrates the Organization Landing Zone architecture for Corp3 within the ECP NextGen environment. The design establishes a structured hierarchy for Azure resource governance, including:
+
+Management Groups (MG): Organize subscriptions based on environment and workload types (e.g., Connectivity, Operations, GIS, Data Services).
+
+Subscriptions: Linked under respective management groups to separate concerns like Image Factory, App Landing Zone, Connectivity, Security Operations, and Data Services.
+
+Resource Groups and Landing Zones:
+
+L1 (Landing Zone Level 1): Establishes base resources like VNet, Subnets, Route Tables, and Key Vaults.
+
+L2 (Landing Zone Level 2): Provides additional services such as Azure Monitor, Private Endpoints, Private DNS zones, and Security Logging (e.g., Azure Activity Logs).
+
+Service Principles:
+
+Subscriptions are peered where required (VNet Peering).
+
+Resource deployments are modular and tied to the management group and subscription structure.
+
+Key resource areas include:
+
+IAM and Directory Management through legacy structures and O365.
+
+Security Operations via GIS Security Labs.
+
+Data Services connected with Virtual Networks and centralized monitoring.
+
+Logging and Monitoring centralized under Platform Logging Subscriptions.
+
+This modular and layered structure ensures:
+
+Simplified governance and policy enforcement.
+
+Clear separation of duties across environments.
+
+Scalability for future cloud growth.
+
+Key Components Seen in the Diagram:
+
+Component	Description
+Management Groups (MGs)	Logical containers grouping subscriptions for governance.
+Subscriptions	Individual Azure billing and resource containers assigned by purpose.
+VNet Peering	Secure, high-speed connectivity between virtual networks.
+Private Endpoints & DNS	Secure connections between Azure services over private IP addresses.
+Key Vaults	Centralized storage for sensitive information like secrets and certificates.
+Azure Activity Logs	Captures operations and security events across the Azure environment.
+Data Collection Endpoints	Enable advanced telemetry and monitoring capabilities for GIS and Data Services.
+
+
+
+Detailed (Technical Audience) Description
+The Organization Landing Zone architecture for Corp3 is designed with a multi-layered structure across management groups and subscriptions.
+
+Management Groups (MGs) provide centralized governance across different operational domains, including Connectivity, Operations, Security, GIS, and Data Services.
+
+Under each MG, specific Azure subscriptions are provisioned for resource isolation and workload specialization, such as:
+
+Image Factory for golden image management.
+
+App Test subscription for application landing zones.
+
+Security Operations subscriptions for GIS environments.
+
+Platform Logging subscriptions for centralized monitoring.
+
+Landing Zone Levels:
+
+Level 1 (L1): Core resource setup like Virtual Networks (VNets), Route Tables, Key Vaults.
+
+Level 2 (L2): Extended services including Private Endpoints, Azure Monitor, and Activity Logs.
+
+VNet Peering is extensively used to interconnect isolated VNets across subscriptions securely.
+
+The architecture enforces clear separation of duties, modular expansion, and enhanced security, supporting current operational needs and future scalability.
+
+✏️ Simplified (Executive/Leadership Audience) Description
+The Corp3 Landing Zone architecture creates a scalable, secure cloud foundation by organizing Azure environments into layers.
+
+Top Layer: Management Groups organize environments by purpose (Operations, Security, Data Services).
+
+Middle Layer: Subscriptions under each group separate major workloads (e.g., App Development, Security Monitoring).
+
+Bottom Layer: Resources like Networks, Databases, and Monitoring Tools are deployed with strict access controls and logging.
+
+Connectivity between workloads is managed securely through Virtual Network Peering, enabling collaboration while maintaining isolation.
+
+This structure ensures strong governance, rapid scaling, and secure cloud operations aligned to business growth.
+
