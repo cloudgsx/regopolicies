@@ -1,0 +1,32 @@
+data "azapi_resource_action" "vm_skus" {
+  type        = "Microsoft.Compute/locations/vmSizes@2022-03-01"
+  resource_id = "/subscriptions/${var.subscription_id}/providers/Microsoft.Compute/locations/${var.location}"
+  action      = "list"
+  response_export_values = ["value"]
+}
+
+# (2) Process SKUs
+locals {
+  vm_skus = jsondecode(data.azapi_resource_action.vm_skus.output).value
+
+  valid_vm_size = contains([
+    for sku in local.vm_skus : sku.name
+  ], var.vm_size)
+}
+
+# (3) Do validation immediately
+locals {
+  vm_size_validation = local.valid_vm_size ? "" : error("ERROR: VM size ${var.vm_size} is invalid or unavailable in region ${var.location}")
+}
+
+# (4) Your actual VM creation
+resource "azurerm_linux_virtual_machine" "vm" {
+  count = local.valid_vm_size ? 1 : 0
+
+  name                = var.name
+  resource_group_name = var.resource_group_name
+  location            = var.location
+  size                = var.vm_size
+  disable_password_authentication = true
+  admin_username      = var.admin_ssh_key_username
+}
