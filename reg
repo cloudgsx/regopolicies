@@ -1,0 +1,64 @@
+# Fetch SKUs filtered by location
+data "azapi_resource_action" "skus" {
+  type                   = "Microsoft.Compute@2021-07-01"
+  resource_id            = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/providers/Microsoft.Compute"
+  action                 = "skus?api-version=2021-07-01&$filter=location%20eq%20'${var.location}'"
+  method                 = "GET"
+  response_export_values = ["*"]
+}
+
+# Process the SKUs
+locals {
+  raw_vm_skus = [
+    for sku in jsondecode(data.azapi_resource_action.skus.output).value : {
+      name         = sku.name
+      resourceType = sku.resourceType
+      tier         = sku.tier
+      size         = sku.size
+      family       = sku.family
+      capabilities = {
+        for capability in sku.capabilities :
+        capability.name => capability.value
+      }
+    }
+    if sku.resourceType == "virtualMachines"
+  ]
+
+  all_vm_skus = [
+    for sku in local.raw_vm_skus : {
+      name         = sku.name
+      resourceType = sku.resourceType
+      tier         = sku.tier
+      size         = sku.size
+      family       = sku.family
+      resources = {
+        vcpus           = tonumber(sku.capabilities["vCPUs"])
+        vcpus_available = tonumber(sku.capabilities["vCPUsAvailable"])
+        vcpus_per_core  = tonumber(sku.capabilities["vCPUsPerCore"])
+        memory_gb       = tonumber(sku.capabilities["MemoryGB"])
+        gpus            = tonumber(lookup(sku.capabilities, "GPUs", "0"))
+        max_disk_count  = tonumber(sku.capabilities["MaxDataDiskCount"])
+        max_nic_count   = tonumber(sku.capabilities["MaxNetworkInterfaces"])
+      }
+      features = {
+        accelerated_networking        = sku.capabilities["AcceleratedNetworkingEnabled"] == "True"
+        premium_io                    = sku.capabilities["PremiumIO"] == "True"
+        rdma                          = sku.capabilities["RdmaEnabled"] == "True"
+        memory_preserving_maintenance = sku.capabilities["MemoryPreservingMaintenanceSupported"] == "True"
+        low_priority                  = sku.capabilities["LowPriorityCapable"] == "True"
+        hibernation                   = lookup(sku.capabilities, "HibernationSupported", "False") == "True"
+        encryption_at_host            = sku.capabilities["EncryptionAtHostSupported"] == "True"
+        ephemeral_os_disk             = sku.capabilities["EphemeralOSDiskSupported"] == "True"
+        capacity_reservation          = sku.capabilities["CapacityReservationSupported"] == "True"
+      }
+    }
+  ]
+
+  matching_vm_skus = [
+    for sku in local.all_vm_skus : sku
+    if sku.name == var.vm_size
+  ]
+
+  # Validation: fail fast if no matching SKU
+  vm_size_validation = length(local.matching_vm_skus) > 0 ? "" : error("ERROR: VM size '${var.vm_size}' is not available in '${var.location}' location!")
+}
