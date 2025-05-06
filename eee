@@ -1,0 +1,30 @@
+ Suggestions
+[Suggestion] Consider extracting the conditional logic for account_replication_type and ip_rules into local variables. This improves readability and testability:
+
+hcl
+Copiar
+Editar
+locals {
+  effective_replication_type = var.is_boot_diagnostic ? "GRS" : var.replication_type
+  effective_ip_rules         = var.is_boot_diagnostic ? concat(var.bank_internet_proxy_ip, var.azure_serial_console_ip) : var.bank_internet_proxy_ip
+}
+Then reference these locals in the resource block instead.
+
+[Suggestion] Add input validation for the new list variables (bank_internet_proxy_ip, Azure_serial_console_ip) to ensure they only accept valid CIDR blocks or IP addresses.
+
+💅 Nitpicks
+[Nitpick] Variable naming: Azure_serial_console_ip is capitalized while others (like bank_internet_proxy_ip) are lowercase. Suggest renaming to azure_serial_console_ip for naming consistency.
+
+[Nitpick] You might want to alphabetize the variable declarations or group them more logically (e.g., networking-related together).
+
+❓ Questions
+[Question] Are there specific use cases where is_boot_diagnostic might be toggled at runtime, or is it intended to be static per environment?
+
+[Question] Is there any audit requirement for IP source changes? If so, would it make sense to externalize these IP lists into a file (e.g., json or tfvars) for better visibility and diffing?
+
+✅ Praise
+[Praise] Great job removing the hardcoded IPs and centralizing them into variables—huge improvement in maintainability and reusability.
+
+[Praise] The use of conditional logic makes the module more flexible without overcomplicating the implementation. Clean and pragmatic.
+
+[Praise] Descriptions for variables are clear and concise. This is often overlooked and adds a lot of value for future maintainers.
