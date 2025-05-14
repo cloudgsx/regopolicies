@@ -1,0 +1,26 @@
+Summary/Context:
+
+A Jenkins build is failing due to an invalid solidateValueSetId, related to lack of proper TFE (Terraform Enterprise) token access.
+
+Investigations revealed that the IaC pipeline token does not have access to the QA team project (71148_ECP_QA_Team) in the TFE-UAT environment.
+
+Miguel confirmed via email that the project was never set up for IaC pipeline access due to a missing automation team association.
+
+A dependency on TFE team response was created, and discussion is ongoing to clarify if the current access suffices or if additional setup/support tickets are needed.
+
+Suggested Reply to John:
+
+Subject: Re: RE: REMINDER: FW: request to get TFE token access for QA project in tfe-uat
+
+Hi John,
+
+Thank you for your response.
+
+To clarify, the current issue we’re facing is with Jenkins builds failing due to missing/invalid TFE token access for the QA project (71148_ECP_QA_Team) in TFE-UAT. As identified by Miguel, this project was not set up with the necessary automation team in TFE, and therefore the IaC pipeline token does not have the required permissions.
+
+The expectation is to enable the IaC pipeline to access this QA project for deploying infrastructure as part of our CI/CD automation. We're not seeking access beyond this specific scope, but just ensuring the current pipeline token can authenticate and operate within the project context.
+
+Please let us know if a support ticket needs to be raised to complete the automation team mapping or any additional steps needed from our side to resolve this.
+
+Thanks and Regards,
+[Your Name]
