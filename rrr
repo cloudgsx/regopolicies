@@ -1,0 +1,130 @@
+resource "random_id" "retry_trigger" {
+  count       = local.max_retries
+  byte_length = 4
+}
+
+data "azapi_resource_action" "skus" {
+  count = local.max_retries
+
+  type        = "Microsoft.Compute@2021-07-01"
+  resource_id = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/providers/Microsoft.Compute"
+  action      = "skus?api-version=2021-07-01&$filter=location%20eq%20'${var.location}'"
+  method      = "GET"
+  response_export_values = ["*"]
+
+  depends_on = flatten([
+    [random_id.retry_trigger[count.index]],
+    count.index > 0 ? [time_sleep.retry_delay[count.index - 1]] : []
+  ])
+}
+
+resource "time_sleep" "retry_delay" {
+  count = local.valid_vm_size ? 0 : local.max_retries - 1
+
+  create_duration = "${local.retry_delay_seconds}s"
+
+  triggers = {
+    attempt  = "${count.index + 1}"
+    vm_size  = var.vm_size
+    location = var.location
+    retry_id = count.index + 1 < local.max_retries ? random_id.retry_trigger[count.index + 1].id : ""
+  }
+
+  depends_on = [
+    data.azapi_resource_action.skus[count.index],
+  ]
+}
+
+locals {
+  max_retries         = 3
+  retry_delay_seconds = 5
+
+  raw_vm_skus = [
+    for attempt in range(local.max_retries) : [
+      for sku in try(jsondecode(data.azapi_resource_action.skus[attempt].output).value, []) : {
+        name         = sku.name
+        resourceType = sku.resourceType
+        tier         = try(sku.tier, null)
+        size         = try(sku.size, null)
+        family       = try(sku.family, null)
+        locations    = sku.locations
+        capabilities = { for cap in sku.capabilities : cap.name => cap.value }
+        features     = { for feat in sku.locationInfo[0].features : feat.name => feat.value }
+      }
+    ]
+  ]
+
+  all_vm_skus = flatten(local.raw_vm_skus)
+
+  matching_vm_skus = [
+    for sku in local.all_vm_skus : sku
+    if sku.name == var.vm_size && contains(sku.locations, var.location)
+  ]
+
+  valid_vm_size = length(local.matching_vm_skus) > 0
+
+  retry_attempts = local.valid_vm_size ? min([for i in range(local.max_retries) : i if length(try(jsondecode(data.azapi_resource_action.skus[i].output).value, [])) > 0][0] + 1, local.max_retries) : local.max_retries
+
+  vm_size_validation = local.valid_vm_size ? "" : (
+    local.retry_attempts >= local.max_retries
+    ? error("ERROR: VM size '${var.vm_size}' is not available in '${var.location}' after ${local.max_retries} attempts!")
+    : ""
+  )
+}
+
+output "vm_size_validation_check" {
+  value       = local.valid_vm_size
+  description = "Testing validation output"
+}
+
+output "retry_attempts_made" {
+  value       = local.retry_attempts
+  description = "Number of retry attempts made"
+}
+
+
+
+
+
+Azure VM Size Validation with Retry (Terraform)
+This Terraform configuration validates whether a specific Azure VM size (vm_size) is available in a given region (location). If the SKU is not immediately available, it automatically retries the validation multiple times with delays between each attempt.
+
+📌 Features
+✅ Validates availability of a VM SKU in a specified Azure region
+
+🔁 Retries the validation up to a configurable number of attempts
+
+⏱ Waits a few seconds between retry attempts using time_sleep
+
+🎯 Fails gracefully only after all retries have been exhausted
+
+🔄 Forces fresh API calls on each retry using random_id
+
+🧹 No external scripts or null_resource required — purely Terraform-native
+
+⚙️ How It Works
+Initial Attempt: Uses the Azure API to check if the desired VM SKU is available.
+
+Retry Trigger: If not found, a new random_id triggers a re-fetch of the SKU data.
+
+Delay: Each retry waits for a configurable number of seconds using time_sleep.
+
+Validation: All responses are collected, and the SKU is considered valid if it appears in any attempt.
+
+Failure: If the SKU is still not available after all retries, Terraform throws a hard error().
+
+
+Important Note: Bypassing Terraform’s Default Data Source Behavior
+By default, Terraform evaluates data sources only once per plan, and does not retry or re-fetch data unless an input changes.
+
+✅ This configuration intentionally bypasses that limitation by:
+
+Using a random_id resource to inject uniqueness into each retry attempt
+
+Chaining depends_on with time_sleep to enforce sequential retry timing
+
+Creating multiple instances of the azapi_resource_action data source, one per retry
+
+This forces fresh API requests on each retry, simulating real retry logic in a declarative environment that normally doesn't support it.
+
+While this behavior is somewhat unconventional, it’s fully supported by Terraform’s semantics and safe for production use — as long as you understand the cost (longer apply time and more API calls).
