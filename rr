@@ -1,0 +1,68 @@
+As a DevOps Engineer,
+I want to automatically generate and update a structured deployment plan in Confluence using information from JIRA release tickets,
+so that I can reduce manual effort, ensure consistency, and improve the accuracy of our release documentation.
+
+📋 Requirements
+Pull JIRA issue data based on specific filters (e.g., project = ECPAWS, status = "Ready to Release").
+
+Extract relevant fields from JIRA:
+
+Issue Key, Summary, Assignee, Labels (e.g., Urgent)
+
+Custom fields: MOJITO ID, Code Review Status, Deployment Steps, Related PR links
+
+Generate a formatted Confluence table (similar to the current deployment plan layout).
+
+Update or overwrite a specific Confluence page (e.g., "Release Implementation Plan") on a scheduled or manual trigger.
+
+Allow flexibility to select which release or ticket set to generate a plan for.
+
+Securely authenticate to JIRA and Confluence using personal access tokens (PATs) or OAuth.
+
+✅ Acceptance Criteria
+#	Description	Must Have / Nice to Have
+1	A script or tool pulls data from JIRA and posts to Confluence	Must Have
+2	Deployment plan in Confluence includes all required fields in the correct column layout	Must Have
+3	Urgent tickets are clearly marked and highlighted	Must Have
+4	The automation runs on demand and/or on a schedule (e.g., via GitHub Actions, Jenkins, etc.)	Nice to Have
+5	Can be configured to filter by JIRA label, status, or sprint	Must Have
+6	Supports version control or backup of Confluence page before update	Nice to Have
+7	Admin users can override or edit the content manually after automation runs	Must Have
+
+🛠️ Technical Notes
+Use the following APIs:
+
+JIRA REST API
+
+Confluence REST API
+
+Consider using Python with jira and atlassian-python-api libraries.
+
+Deployment steps and code review statuses might come from custom fields (needs JIRA admin to confirm field IDs).
+
+Use Confluence table markup or HTML to format the content cleanly.
+
+
+
+
+
+Option 1: Use Atlassian Automation + Smart Links (Best for Simplicity)
+Tool Used: JIRA Automation + Smart Confluence Macros
+
+Approach:
+
+Set up a JIRA filter that captures all release tickets (e.g., label = "release").
+
+Use JIRA Automation to send updates to Confluence when tickets transition to a release-ready status.
+
+Use Smart Links or Excerpt macros to display structured ticket data in Confluence pages.
+
+Pros:
+
+No coding needed.
+
+Real-time updates as tickets move.
+
+Cons:
+
+Less customizable in terms of layout.
