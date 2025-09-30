@@ -1,0 +1,52 @@
+// backend.hcl (or inline in a terraform block)
+bucket         = "terraform-state"
+key            = "372342052824/us-west-2/14086/imagebuilder_infrastructure.tfstate"
+region         = "us-west-2"
+# dynamodb_table = "terraform-locks"   # include if you use state locking
+# encrypt = true                       # if enabled
+
+
+terraform init -backend-config=backend.hcl
+
+terraform state pull > state-$(date +%F-%H%M%S).json
+
+
+terraform state list
+terraform plan
+
+
+Safest workflow on your EC2 instance (S3 backend)
+
+Have Terraform + AWS creds (the instance role usually covers this).
+
+In an empty folder, create a minimal backend config that points to the object you sh
+intialize
+Pull a backup of the current state:
+
+(This uses the backend and respects locking. Don’t use aws s3 cp to overwrite state.)
+
+Edit the JSON (only if you know exactly what you’re doing).
+
+Push the edited file back:
+
+This will overwrite the remote state for this workspace/key. Make sure no one else is running Terraform and that the DynamoDB lock (if used) is acquired.
+
+terraform state list
+terraform plan
+
+
+If you can avoid manual edits
+
+Prefer these commands, which change state without opening the JSON:
+
+Move resources in state: terraform state mv <addr_from> <addr_to>
+
+Remove a resource from state: terraform state rm <addr>
+
+Import real-world object into state: terraform import <addr> <id>
+
+Notes
+
+If S3 versioning is enabled, you can always roll back a bad push by restoring a previous object version.
+
+Avoid using aws s3 cp to upload an edited file—it bypasses Terraform’s locking and can corrupt shared state.
