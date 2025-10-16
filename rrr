@@ -1,0 +1,267 @@
+EC2 Metadata Web Application
+Overview
+This document describes a lightweight web application that displays EC2 instance metadata through a simple browser interface. The application runs directly on EC2 instances and provides real-time visibility into instance configuration details.
+
+What Is This?
+This is a Python Flask web application that:
+
+Runs on Ubuntu-based EC2 instances
+Fetches and displays instance metadata from the AWS Instance Metadata Service (IMDS)
+Provides a simple web interface accessible via the instance's public IP
+Automatically starts on instance boot and restarts if it crashes
+
+Displayed Metadata
+The application currently displays three key pieces of information:
+
+Instance ID: Unique identifier for the EC2 instance
+Instance Type: The size/family of the instance (e.g., t3.micro, m5.large)
+Availability Zone: The specific AZ where the instance is running
+
+
+Why This Approach?
+Business Value
+Operational Visibility: Provides instant access to critical instance information without needing to log into the AWS Console or use CLI tools.
+Troubleshooting: When investigating issues, team members can quickly verify they're looking at the correct instance and understand its configuration.
+Documentation: Creates a self-documenting infrastructure where instances can identify themselves, useful during incidents or handoffs.
+Technical Benefits
+Zero External Dependencies: Uses only AWS-native metadata service and standard Ubuntu packages. No third-party APIs, databases, or external services required.
+IMDSv2 Compliant: Implements AWS's recommended security standard (Instance Metadata Service Version 2) which requires session tokens, protecting against SSRF attacks.
+Lightweight: Minimal resource footprint with a simple Flask application that consumes very little CPU and memory.
+Automated Deployment: Fully automated through EC2 user data scripts - no manual configuration required after launch.
+Resilient: Runs as a systemd service with automatic restart on failure, ensuring high availability.
+Why Flask Over Static HTML?
+We chose Flask over a simple static HTML page for several reasons:
+
+Dynamic Data: Metadata is fetched in real-time on each page load, ensuring always-current information even after instance modifications
+Extensibility: Easy to add more endpoints, API routes, or additional metadata fields as needs evolve
+Error Handling: Better control over error scenarios and timeouts when communicating with IMDS
+Future Features: Simple to add authentication, logging, health checks, or integrations with other services
+
+
+Architecture
+Components
+┌─────────────────────────────────────────┐
+│         EC2 Instance (Ubuntu)           │
+│                                         │
+│  ┌───────────────────────────────────┐ │
+│  │   Flask Web Application           │ │
+│  │   - Port 80                       │ │
+│  │   - Python 3                      │ │
+│  │   - Virtual Environment           │ │
+│  └───────────┬───────────────────────┘ │
+│              │                          │
+│              ↓                          │
+│  ┌───────────────────────────────────┐ │
+│  │   AWS Instance Metadata Service   │ │
+│  │   (IMDSv2)                        │ │
+│  │   - 169.254.169.254               │ │
+│  └───────────────────────────────────┘ │
+│                                         │
+│  ┌───────────────────────────────────┐ │
+│  │   Systemd Service                 │ │
+│  │   - Auto-start on boot            │ │
+│  │   - Auto-restart on failure       │ │
+│  └───────────────────────────────────┘ │
+└─────────────────────────────────────────┘
+                 ↑
+                 │ HTTP (Port 80)
+                 │
+         ┌───────┴────────┐
+         │  End Users     │
+         │  (Browser)     │
+         └────────────────┘
+Data Flow
+
+User accesses instance public IP via browser
+Flask application receives HTTP request on port 80
+Flask requests a session token from IMDS (IMDSv2 requirement)
+Using the token, Flask fetches metadata from IMDS
+Flask renders HTML template with metadata values
+Browser displays formatted page to user
+
+
+IMDSv2 Security
+What is IMDSv2?
+Instance Metadata Service Version 2 is AWS's enhanced metadata service that requires session-oriented authentication. It was introduced to prevent certain types of attacks, particularly Server-Side Request Forgery (SSRF).
+How It Works
+
+Token Request: Application makes a PUT request to get a session token
+
+Endpoint: http://169.254.169.254/latest/api/token
+Header: X-aws-ec2-metadata-token-ttl-seconds: 21600
+
+
+Token Usage: Application includes token in subsequent metadata requests
+
+Header: X-aws-ec2-metadata-token: <token-value>
+
+
+Security Benefits:
+
+Prevents open proxies from accessing metadata
+Requires intentional, multi-step interaction
+Tokens expire (6 hour TTL in our implementation)
+Mitigates SSRF vulnerabilities
+
+
+
+
+Deployment
+Prerequisites
+
+Ubuntu-based EC2 instance
+Security group allowing inbound traffic on port 80
+Virtual environment at /data/venv with Flask installed
+IMDSv2 enabled on the instance (AWS default)
+
+Installation Method
+The application is deployed via EC2 User Data script, which:
+
+Updates system packages
+Installs Python 3 and pip
+Installs Flask in the virtual environment
+Creates the Flask application
+Configures systemd service
+Starts the application automatically
+
+User Data Script
+The complete user data script is available in the artifact. Simply paste it into the "User Data" field under "Advanced Details" when launching an EC2 instance.
+Manual Deployment
+If deploying to an existing instance:
+bash# SSH into instance
+ssh ubuntu@<instance-ip>
+
+# Copy the Flask app code to /opt/metadata-app/app.py
+sudo mkdir -p /opt/metadata-app
+sudo nano /opt/metadata-app/app.py
+# Paste app.py content
+
+# Create systemd service
+sudo nano /etc/systemd/system/metadata-app.service
+# Paste service configuration
+
+# Enable and start
+sudo systemctl daemon-reload
+sudo systemctl enable metadata-app.service
+sudo systemctl start metadata-app.service
+
+Usage
+Accessing the Application
+Once deployed, access the application by navigating to:
+http://<instance-public-ip>
+No authentication is required (configure security groups to restrict access as needed).
+Refreshing Metadata
+Click the "Refresh Metadata" button on the page to fetch the latest values from IMDS.
+
+Operations
+Service Management
+bash# Check status
+sudo systemctl status metadata-app.service
+
+# View logs
+sudo journalctl -u metadata-app.service -f
+
+# Restart service
+sudo systemctl restart metadata-app.service
+
+# Stop service
+sudo systemctl stop metadata-app.service
+
+# Disable auto-start
+sudo systemctl disable metadata-app.service
+Monitoring
+The application logs to systemd journal. Common issues to watch:
+
+Port 80 in use: Another service may be using port 80
+IMDS timeout: Network issues or IMDS not enabled
+401 Unauthorized: IMDSv2 not properly configured or token issue
+Virtual environment not found: Check /data/venv path exists
+
+Troubleshooting
+Application won't start:
+bash# Check if port 80 is available
+sudo netstat -tulpn | grep :80
+
+# Verify venv exists
+ls -la /data/venv/bin/activate
+
+# Check Flask is installed in venv
+source /data/venv/bin/activate
+pip list | grep -i flask
+401 Errors (as shown in screenshot):
+
+Ensure IMDSv2 is enabled on the instance
+Verify the token request is working
+Check the updated get_metadata() function is deployed
+
+Service crashes immediately:
+bash# Check detailed logs
+sudo journalctl -u metadata-app.service -n 50 --no-pager
+
+Security Considerations
+Network Security
+
+Security Groups: Restrict port 80 access to trusted IP ranges or VPCs
+Private Subnets: Consider deploying in private subnets with ALB/NLB
+VPN/Bastion: Access through VPN or bastion host for sensitive environments
+
+Application Security
+
+No Authentication: Current implementation has no authentication - add if needed
+Read-Only Access: Application only reads metadata, cannot modify instance
+IMDSv2: Using secure version of metadata service
+Run as Root: Service runs as root (required for port 80) - consider using port 8080 with nginx proxy if concerned
+
+AWS IAM
+This application does not require any IAM permissions. It only accesses the instance metadata service, which is available to all processes running on the instance without credentials.
+
+Future Enhancements
+Potential Features
+
+Additional Metadata Fields:
+
+Public/Private IP addresses
+AMI ID
+Security groups
+IAM role
+User data
+Tags
+
+
+API Endpoints:
+
+JSON API for programmatic access
+Health check endpoint
+Metrics endpoint for monitoring
+
+
+Authentication:
+
+Basic auth
+SSO integration
+IP whitelisting
+
+
+UI Improvements:
+
+Dark mode
+Auto-refresh option
+Historical data/changes
+Export functionality
+
+
+Monitoring Integration:
+
+CloudWatch metrics
+Application logs to CloudWatch Logs
+Health check reporting
+
+
+
+
+Related Documentation
+
+AWS EC2 Instance Metadata Service
+IMDSv2 Migration Guide
+Flask Documentation
+EC2 User Data Scripts
