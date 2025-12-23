@@ -1,0 +1,106 @@
+A.1 Option 1 – Manual Provider Distribution (Not Recommended)
+
+Description:
+This option relies on manually exporting Terraform provider binaries and uploading them directly into Terraform Enterprise environments. It typically involves human-driven steps and lacks centralized governance, making it unsuitable for regulated or large-scale environments.
+
+(Existing bullet points remain unchanged)
+
+A.2 Option 2 – Direct TFE-to-TFE Provider Sharing (Limited Use)
+
+Description:
+This option attempts to share providers directly between Terraform Enterprise instances (e.g., On-Prem to AWS). While it reduces duplication, it introduces tight coupling between TFE environments and does not provide sufficient security or compliance controls.
+
+(Existing bullet points remain unchanged)
+
+A.3 Option 3 – Artifactory-Centric Provider Publishing (Preferred)
+
+Description:
+This option introduces Artifactory as a centralized, governed repository for Terraform provider binaries. All providers are built, scanned, approved, and stored in Artifactory before being consumed by Terraform Enterprise. This model decouples provider storage from execution environments and enables strong security, compliance, and audit controls.
+
+(Existing bullet points remain unchanged)
+
+A.4 End-to-End Provider Publishing Flow via Artifactory
+
+Description:
+This section describes the full lifecycle of a Terraform provider from request through build, security approval, storage in Artifactory, and eventual consumption by Terraform Enterprise. It demonstrates how providers move through controlled stages without manual intervention.
+
+(Existing step-by-step flow remains unchanged)
+
+Advantages of This Approach
+
+Compared to manual or direct TFE-sharing approaches, this model:
+
+Eliminates ad-hoc provider uploads and human error
+
+Centralizes security scanning and approval workflows
+
+Provides a single, authoritative source of provider binaries
+
+Decouples provider lifecycle from Terraform runtime environments
+
+Scales cleanly across lab, platform, and future environments
+
+Meets enterprise audit and compliance expectations
+
+A.5 Network & Security Model
+
+Description:
+This section explains how Artifactory, TFE, and CI/CD interact over secure, outbound-only network paths, ensuring no provider artifacts are publicly exposed or accessible outside approved systems.
+
+(Existing content unchanged)
+
+A.6 Governance & Promotion Model
+
+Description:
+Defines how provider versions are promoted between stages (staging → approved → deprecated) and how governance controls prevent unauthorized or unreviewed provider usage.
+
+(Existing content unchanged)
+
+A.7 Operational Benefits
+
+Description:
+Summarizes the operational improvements gained by standardizing provider intake and distribution through Artifactory.
+
+(Existing content unchanged)
+
+A.8 Decision Record
+
+Description:
+Captures the final architectural decision and rationale for using Artifactory as the authoritative provider repository.
+
+(Existing content unchanged)
+
+A.9 Acceptance Criteria Mapping
+
+Description:
+Maps this design to the original acceptance criteria to demonstrate completeness and traceability.
+
+(Existing content unchanged)
+
+A.10 Provider Intake Control Model (GIS & Security)
+
+Description:
+This section defines the controlled intake process for introducing providers into Artifactory, including who is allowed to publish, how approvals are enforced, and how GIS maintains governance over provider content.
+
+(Existing intake steps remain unchanged)
+
+Advantages of This Intake Model
+
+Compared to unmanaged or developer-driven uploads, this model:
+
+Enforces separation of duties between developers, platform, and security
+
+Prevents unapproved binaries from entering execution environments
+
+Provides full traceability from request → approval → usage
+
+Aligns with GIS security and compliance standards
+
+Reduces risk of supply-chain compromise
+
+Establishes a repeatable and auditable provider onboarding process
+
+A.11 Audit & Compliance
+
+Description:
+Describes how provider artifacts, approvals, and usage are audited and retained to meet compliance and regulatory requirements.
