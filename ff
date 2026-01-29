@@ -1,0 +1,129 @@
+⚠️ Potential Risks & Limitations
+Policy-Specific Risks
+S3/SNS Topic Policy Overwrite Warning
+Risk 1: Cross-Workspace Detection Gap
+
+Issue: Policy only detects topics within the current Terraform plan. If an SNS topic exists in a different Terraform workspace or was created manually, the policy won't detect it as "existing."
+Impact: Could still result in policy overwrites if teams use multiple workspaces
+Mitigation: Document workspace boundaries; consider central topic registry
+
+Risk 2: Topic ARN Format Variations
+
+Issue: Policy validates startswith(topic_arn, "arn:aws:sns:") but doesn't validate full ARN structure
+Impact: Malformed ARNs might pass validation
+Mitigation: Additional regex validation could be added if needed
+
+Risk 3: Timing Window
+
+Issue: Policy checks Terraform plan state, not real-time AWS state
+Impact: Topic could be created between plan and apply
+Mitigation: Standard Terraform workflow; rare in practice
+
+
+SNS Unique Name Policy
+Risk 1: State File Boundary
+
+Issue: Only detects duplicates within single Terraform plan/state
+Impact: Two separate Terraform deployments could create same-named topics
+Mitigation: Team coordination; consider centralized naming registry
+
+Risk 2: Existing AWS Topics
+
+Issue: Policy doesn't query AWS API to check existing topics
+Impact: Could flag violation even if existing topic should be replaced
+Mitigation: Terraform will catch the error at apply; this is intended behavior
+
+Risk 3: Module Instantiation
+
+Issue: If modules instantiate topics with hardcoded names, duplicates might not be caught until runtime
+Impact: Violations in module instances
+Mitigation: Module variables should enforce unique naming
+
+
+Framework Integration Risks
+Risk 1: OPA Skip Exception Misuse
+
+Issue: Teams might add blanket exceptions to bypass policies
+Impact: Defeats purpose of governance
+Mitigation: Exception requests require approval; audit exception usage
+
+Risk 2: Metadata Extraction Edge Cases
+
+Issue: Policy uses fallback values when rego.metadata.chain() is empty
+Impact: In testing, uses hardcoded values instead of METADATA block
+Mitigation: Fallbacks match production values; affects only unit tests
+
+Risk 3: Terraform Version Compatibility
+
+Issue: Policy tested with Terraform plan JSON format as of 2024
+Impact: Future Terraform versions might change plan structure
+Mitigation: Pin Terraform version; test before upgrading
+
+Risk 4: Performance on Large Plans
+
+Issue: execute_rule() creates one violation per resource (not deduplicated)
+Impact: Plans with 100+ violating resources could generate 100+ violations
+Mitigation: Expected behavior for visibility; can be addressed if needed
+
+
+Operational Risks
+Risk 1: Policy Update Rollout
+
+Issue: Updating policy might affect existing exception lists or workflows
+Impact: Temporary CI/CD pipeline failures
+Mitigation: Test in non-prod; coordinate with teams; version policies
+
+Risk 2: False Positive Fatigue
+
+Issue: Too many warnings might lead to "alert fatigue"
+Impact: Teams might ignore legitimate violations
+Mitigation: Monitor violation rates; tune policies based on feedback
+
+Risk 3: Documentation Drift
+
+Issue: Internal/external site links might change over time
+Impact: FIX DOCUMENTATION links could break
+Mitigation: Periodic link validation; update METADATA when links change
+
+
+Recommended Safeguards
+✅ Monitor & Measure
+
+Track violation rates (aim for <5% steady state)
+Monitor exception request patterns
+Review policy effectiveness quarterly
+
+✅ Clear Communication
+
+Announce policy rollout with 2-week lead time
+Provide remediation examples
+Hold office hours for questions
+
+✅ Gradual Rollout
+
+Phase 1: Warning-only mode (collect data)
+Phase 2: Enforce in dev/staging
+Phase 3: Enforce in production
+
+✅ Escape Hatches
+
+Document exception request process
+Fast-track process for urgent deployments
+Review exceptions quarterly for patterns
+
+✅ Continuous Improvement
+
+Gather feedback from first 50 violations
+Tune detection logic based on false positives
+Add new checks based on real incidents
+
+
+Risk Acceptance Statement
+These policies implement preventive controls with known limitations. They reduce risk by catching common mistakes early, but do not eliminate all scenarios. Teams should:
+
+Understand workspace boundaries
+Follow naming conventions
+Request exceptions when needed
+Validate changes in non-prod first
+
+The benefits (preventing production incidents, faster feedback) outweigh the risks (edge cases, performance considerations).
